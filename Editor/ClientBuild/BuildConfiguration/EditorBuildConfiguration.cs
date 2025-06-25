@@ -3,9 +3,6 @@
 namespace UniGame.UniBuild.Editor
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
-    using Editor;
 
     [Serializable]
     public class EditorBuildConfiguration : IUniBuilderConfiguration

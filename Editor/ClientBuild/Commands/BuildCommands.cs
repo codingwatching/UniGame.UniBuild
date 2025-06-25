@@ -1,12 +1,11 @@
 
-namespace UniModules.UniGame.UniBuild
+namespace UniGame.UniBuild.Editor
 {
     using System;
     using System.Collections.Generic;
-    using global::UniGame.UniBuild.Editor.Abstract;
-    using global::UniGame.UniBuild.Editor;
-    using global::UniGame.UniBuild.Editor.Interfaces;
+    using Abstract;
     using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;
@@ -17,6 +16,7 @@ namespace UniModules.UniGame.UniBuild
 #endif
     
     [Serializable]
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild")]
     public class BuildCommands : IBuildCommands
     {
         private static Color _oddColor = new Color(0.2f, 0.4f, 0.3f);

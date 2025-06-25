@@ -1,19 +1,20 @@
-﻿namespace Game.Modules.UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands
+﻿namespace UniGame.UniBuild.Editor.Commands
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using global::UniGame.UniBuild.Editor.Commands.PreBuildCommands;
-    
+    using ClientBuild.BuildConfiguration;
+    using Editor;
     using UnityEditor;
+    using UnityEngine.Scripting.APIUpdating;
 
 #if ODIN_INSPECTOR
     using Sirenix.OdinInspector;
+    
 #elif TRI_INSPECTOR
     using TriInspector;
 #endif
     
     [Serializable]
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
     public class ApplyWebGLSettingsCommand : SerializableBuildCommand
     {
         public WebGlBuildData webGlBuildData = new();

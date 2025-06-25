@@ -1,10 +1,10 @@
 ﻿using UniGame.Core.Runtime;
 
-namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands {
+namespace UniGame.UniBuild.Editor.Commands {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using Editor;
     using UnityEditor;
+    using UnityEngine.Scripting.APIUpdating;
 
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;
@@ -15,7 +15,8 @@ namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands {
 #endif
     
     [Serializable]
-    public class DisableUnityLogoCommand : UnitySerializablePreBuildCommand, ICommand
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class DisableUnityLogoCommand : SerializableBuildCommand, ICommand
     {
 
         public bool enableSplashScreen = false;

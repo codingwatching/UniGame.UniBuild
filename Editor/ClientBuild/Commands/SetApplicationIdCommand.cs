@@ -1,8 +1,4 @@
-using System;
-using UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-using UniGame.UniBuild.Editor.Commands.PreBuildCommands;
-
-namespace Game.Modules.UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands
+namespace UniGame.UniBuild.Editor.Commands
 {
     using UnityEditor;
     
@@ -14,7 +10,6 @@ namespace Game.Modules.UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands
     using TriInspector;
 #endif
     
-    [Serializable]
     public class SetApplicationIdCommand : UnityBuildCommand
     {
         public string applicationId = "com.company.product";

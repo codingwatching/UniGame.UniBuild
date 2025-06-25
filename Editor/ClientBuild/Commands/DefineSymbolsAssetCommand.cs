@@ -1,10 +1,10 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor.Commands
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using Editor;
     using UnityEngine;
-    
+    using UnityEngine.Scripting.APIUpdating;
+
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;
 #endif
@@ -15,7 +15,8 @@
     
     [Serializable]
     [CreateAssetMenu(menuName = "UniBuild/Commands/DefineSymbolsAssetCommand",fileName = nameof(DefineSymbolsAssetCommand))]
-    public class DefineSymbolsAssetCommand : UnityPreBuildCommand
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class DefineSymbolsAssetCommand : UnityBuildCommand
     {
         [SerializeField]
 #if  ODIN_INSPECTOR || TRI_INSPECTOR

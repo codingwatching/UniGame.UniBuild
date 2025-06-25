@@ -1,11 +1,12 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor
 {
     using System;
     using System.IO;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
+    using Editor;
     using UniModules.UniGame.GitTools.Runtime;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
 #if ODIN_INSPECTOR
     using Sirenix.OdinInspector;
@@ -16,7 +17,8 @@
 #endif
     
     [Serializable]
-    public class ApplyArtifactNameCommand : UnitySerializablePreBuildCommand
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class ApplyArtifactNameCommand : SerializableBuildCommand
     {
         private const string nameFormatTemplate = "{0}-{1}";
 

@@ -1,18 +1,19 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor.Commands
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using Editor;
     using Parsers;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
     /// <summary>
     /// https://docs.unity3d.com/ScriptReference/BuildOptions.html
     /// any build parameter and be used by template "-[BuildOptions Item]"
     /// </summary>
     [Serializable]
-    public class BuildOptionsCommand : UnitySerializablePreBuildCommand
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class BuildOptionsCommand : SerializableBuildCommand
     {
         public bool setIncrementalIl2CppBuild = true;
         

@@ -2,8 +2,7 @@
 {
     using System.Linq;
     using global::UniGame.UniBuild.Editor.ClientBuild;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using global::UniGame.UniBuild.Editor;
     using Parsers;
     using UnityEditor;
 

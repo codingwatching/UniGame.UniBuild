@@ -1,6 +1,6 @@
-namespace UniGame.UniBuild.Editor.Interfaces
+namespace UniGame.UniBuild.Editor
 {
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
+    using global::UniGame.UniBuild.Editor;
     using UnityEditor.Build.Reporting;
 
     public interface IUnityPlayerBuilder

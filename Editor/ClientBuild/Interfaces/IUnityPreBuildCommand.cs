@@ -1,4 +1,5 @@
-namespace UniGame.UniBuild.Editor.Interfaces {
+namespace UniGame.UniBuild.Editor 
+{
     public interface IUnityPreBuildCommand : IUnityBuildCommand
     {
 

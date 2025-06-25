@@ -1,11 +1,11 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor.Commands
 {
     using System;
     using System.Text;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using Editor;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;
@@ -16,7 +16,8 @@
 #endif
     
     [Serializable]
-    public class UpdateAndroidKeyStoreCommand : UnitySerializablePreBuildCommand
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class UpdateAndroidKeyStoreCommand : SerializableBuildCommand
     {
         [Space]
         public bool useDebugKeyStore = false;

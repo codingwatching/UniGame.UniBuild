@@ -3,8 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using global::UniGame.UniBuild.Editor;
 
     public class EnumArgumentParser<TValue> 
         where TValue : struct

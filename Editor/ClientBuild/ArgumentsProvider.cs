@@ -5,8 +5,6 @@ namespace UniGame.UniBuild.Editor
     using System;
     using System.Collections.Generic;
     using System.Text;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
 
     public class ArgumentsProvider : IArgumentsProvider 
     {

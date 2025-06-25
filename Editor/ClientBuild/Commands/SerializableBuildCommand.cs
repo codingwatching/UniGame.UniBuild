@@ -1,8 +1,6 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
     using UniModules.Editor;
     using UnityEngine;
 

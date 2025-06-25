@@ -1,13 +1,12 @@
 ﻿namespace UniModules.UniGame.UniBuild
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
     using global::UniGame.UniBuild.Editor;
-    using global::UniGame.UniBuild.Editor.Commands.PreBuildCommands;
-    using global::UniGame.UniBuild.Editor.Interfaces;
+    using UnityEngine.Scripting.APIUpdating;
 
 
     [Serializable]
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
     public class ApplyBuildArgumentsCommand : SerializableBuildCommand
     {        
         public bool logArguments = true;

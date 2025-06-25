@@ -1,6 +1,5 @@
-namespace UniGame.UniBuild.Editor.ClientBuild.Interfaces
+namespace UniGame.UniBuild.Editor
 {
-    using Editor;
     using UnityEditor.Build.Reporting;
 
     public interface IUniBuilderConfiguration

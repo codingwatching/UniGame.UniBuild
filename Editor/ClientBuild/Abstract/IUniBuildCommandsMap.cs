@@ -5,7 +5,6 @@ namespace UniGame.UniBuild.Editor.Abstract
 {
     using global::UniGame.Core.Runtime;
     using global::UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration;
-    using Interfaces;
 
     public interface IUniBuildCommandsMap : 
         IUnityBuildCommandValidator,

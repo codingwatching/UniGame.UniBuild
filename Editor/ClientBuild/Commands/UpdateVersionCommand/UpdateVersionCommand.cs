@@ -5,11 +5,11 @@ namespace UniModules.UniGame.UniBuild.Editor.UpdateVersionCommand
     using System;
     using System.Text;
     using GitTools.Runtime;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using global::UniGame.UniBuild.Editor.Commands.PreBuildCommands;
+    using global::UniGame.UniBuild.Editor;
     using UnityEditor;
     using UnityEngine;
-    
+    using UnityEngine.Scripting.APIUpdating;
+
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;
 #endif
@@ -22,7 +22,8 @@ namespace UniModules.UniGame.UniBuild.Editor.UpdateVersionCommand
     /// update current project version
     /// </summary>
     [Serializable]
-    public class UpdateVersionCommand : UnitySerializablePreBuildCommand
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class UpdateVersionCommand : SerializableBuildCommand
     {
         [SerializeField]
         private int minBuildNumber = 0;

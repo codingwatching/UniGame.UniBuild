@@ -1,10 +1,9 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor.Commands
 {
     using System;
     using global::UniCore.Runtime.Attributes;
     using UnityEditor;
     using UnityEngine;
-    using UnityEngine.Serialization;
     using AndroidArchitecture = UnityEditor.AndroidArchitecture;
     using AndroidBuildType = UnityEditor.AndroidBuildType;
 

@@ -1,11 +1,11 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor.Commands
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using Editor;
     using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
-    
+
     [Serializable]
     public abstract class UnityBuildCommand : ScriptableObject,IUnityBuildCommand
     {

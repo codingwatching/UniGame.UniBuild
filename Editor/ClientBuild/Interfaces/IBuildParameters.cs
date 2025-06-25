@@ -1,4 +1,4 @@
-namespace UniGame.UniBuild.Editor.Interfaces {
+namespace UniGame.UniBuild.Editor {
     using System.Collections.Generic;
     using UnityEditor;
 

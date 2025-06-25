@@ -1,11 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-using UniGame;
 
 namespace UniGame.UniBuild.Editor
 {
     using UniModules.Editor;
     using global::UniGame.Core.Runtime.Extension;
-    using Editor;
     using UnityEngine;
 
     public class CloudBuildMethodsGenerator

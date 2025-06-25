@@ -1,12 +1,8 @@
 ﻿using System;
-using UniGame.UniBuild.Editor;
-using UniGame.UniBuild.Editor.Commands.PreBuildCommands;
-using UniGame.UniBuild.Editor.Interfaces;
-using UnityEngine;
 
-namespace UniModules.UniGame.UniBuild
+namespace UniGame.UniBuild.Editor
 {
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
+    using UnityEngine.Scripting.APIUpdating;
 
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;
@@ -17,6 +13,7 @@ namespace UniModules.UniGame.UniBuild
 #endif
 
     [Serializable]
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild")]
     public class BuildCommandsGroup : SerializableBuildCommand,IUnityPreBuildCommand,IUnityPostBuildCommand
     {
         private const string LogMessageFormat = "GROUP [{0}] : \n{1}";

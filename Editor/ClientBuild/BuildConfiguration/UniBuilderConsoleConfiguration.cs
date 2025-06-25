@@ -1,6 +1,5 @@
 ﻿namespace UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration
 {
-    using UniGame.UniBuild.Editor.ClientBuild.Interfaces;
     using Editor;
     using Editor.Extensions;
     using Editor.Parsers;

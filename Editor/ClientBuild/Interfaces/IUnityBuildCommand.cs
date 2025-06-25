@@ -1,7 +1,5 @@
-﻿namespace UniGame.UniBuild.Editor.Interfaces
+﻿namespace UniGame.UniBuild.Editor
 {
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-
     public interface IUnityBuildCommand : IUnityBuildCommandValidator, IUnityBuildCommandInfo
     {
         void Execute(IUniBuilderConfiguration configuration);

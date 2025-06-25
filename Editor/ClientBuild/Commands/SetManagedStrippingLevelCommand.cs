@@ -1,15 +1,17 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor.Commands
 {
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using System;
+    using Editor;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
     /// <summary>
     /// update current project version
     /// </summary>
-    [SerializeField]
-    public class SetManagedStrippingLevelCommand : UnitySerializablePreBuildCommand
+    [Serializable]
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class SetManagedStrippingLevelCommand : SerializableBuildCommand
     {
         [SerializeField]
         private ManagedStrippingLevel _managedStrippingLevel = ManagedStrippingLevel.Disabled;

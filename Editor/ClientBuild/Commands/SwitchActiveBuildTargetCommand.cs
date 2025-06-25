@@ -1,13 +1,13 @@
-﻿using UniGame.UniBuild.Editor.Interfaces;
-
-namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor.Commands
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
+    using Editor;
     using UnityEditor;
+    using UnityEngine.Scripting.APIUpdating;
 
     [Serializable]
-    public class SwitchActiveBuildTargetCommand : UnitySerializablePreBuildCommand
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class SwitchActiveBuildTargetCommand : SerializableBuildCommand
     {
         
         public BuildTargetGroup BuildTargetGroup = BuildTargetGroup.Android;

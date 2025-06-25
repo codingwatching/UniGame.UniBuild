@@ -1,19 +1,20 @@
-﻿using UniGame.UniBuild.Editor.Interfaces;
-
-namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands.AssetsCommands
+﻿namespace UniGame.UniBuild.Editor
 {
+    using System;
     using System.Collections.Generic;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
     using UnityEditor;
-    using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
+    using Object = UnityEngine.Object;
 
     /// <summary>
     /// reimport target assets locations
     /// or target assets
     /// </summary>
-    public class ReimportAssetsCommand : UnitySerializablePreBuildCommand
+    [MovedFrom(sourceNamespace:"UniGame.UniBuild.Editor.Commands.AssetsCommands")]
+    [Serializable]
+    public class ReimportAssetsCommand : SerializableBuildCommand
     {
-        public List<Object> assets = new List<Object>();
+        public List<Object> assets = new();
 
         public ImportAssetOptions ImportAssetOptions = ImportAssetOptions.ImportRecursive;
         

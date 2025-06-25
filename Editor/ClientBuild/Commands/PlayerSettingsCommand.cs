@@ -1,8 +1,7 @@
 using System;
-using UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-using UniGame.UniBuild.Editor.Commands.PreBuildCommands;
-using UniGame.UniBuild.Editor.Interfaces;
+using UniGame.UniBuild.Editor;
 using UnityEditor;
+using UnityEngine.Scripting.APIUpdating;
 
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;
@@ -13,6 +12,7 @@ using TriInspector;
 #endif
 
 [Serializable]
+[MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
 public class PlayerSettingsCommand : SerializableBuildCommand
 {
     public bool setIncrementalIl2CppBuild = true;

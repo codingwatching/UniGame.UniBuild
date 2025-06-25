@@ -1,10 +1,10 @@
-﻿namespace UniGame.UniBuild.Editor.Commands.PreBuildCommands
+﻿namespace UniGame.UniBuild.Editor
 {
     using System;
-    using global::UniGame.UniBuild.Editor.ClientBuild.Interfaces;
-    using Interfaces;
+    using Commands;
     using UnityEditor;
     using UnityEditor.Build;
+    using UnityEngine.Scripting.APIUpdating;
 
 #if UNITY_ANDROID
     using UnityEditor.Android;
@@ -19,7 +19,8 @@
 #endif
     
     [Serializable]
-    public class ApplyAndroidSettingsCommand : UnitySerializablePreBuildCommand
+    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    public class ApplyAndroidSettingsCommand : SerializableBuildCommand
     {
 #if ODIN_INSPECTOR || TRI_INSPECTOR
         [InlineProperty] 
