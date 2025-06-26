@@ -17,7 +17,8 @@
 #endif
     
     [Serializable]
-    [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [MovedFrom(true,sourceClassName:"ApplyArtifactNameWithVersionCommand",
+        sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
     public class ApplyArtifactNameCommand : SerializableBuildCommand
     {
         private const string nameFormatTemplate = "{0}-{1}";
