@@ -26,6 +26,8 @@ public class UniBuildItem
 #endif
     public UniBuildCommandsMap buildCommands;
 
+    public string Name => buildCommands == null ? string.Empty : buildCommands.name;
+    
 #if  ODIN_INSPECTOR || TRI_INSPECTOR
     [Button]
 #endif
