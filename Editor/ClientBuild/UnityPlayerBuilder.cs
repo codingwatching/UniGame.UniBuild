@@ -157,6 +157,8 @@
     
             BuildLogger.Log($"OUTPUT LOCATION : {outputLocation}");
 
+            var scenesArray = scenes.Select(x => x.path).ToArray();
+            
             var buildConfig = new BuildPlayerOptions
             {
                 locationPathName = outputLocation,
@@ -164,16 +166,32 @@
                 #if UNITY_STANDALONE || UNITY_SERVER
                 subtarget = (int)buildParameters.standaloneBuildSubtarget,
                 #endif
-                scenes = scenes.Select(x => x.path).ToArray(),
+                scenes = scenesArray,
                 options = buildOptions,
                 targetGroup = buildParameters.buildTargetGroup,
             };
-            
-            var report = BuildPipeline.BuildPlayer(buildConfig);
-            BuildLogger.Log(report.ReportMessage());
-            return report;
 
-            return default;
+            var buildProfile = buildParameters.buildProfile;
+            
+            BuildReport report = default;
+            
+            if (buildProfile != null)
+            {
+                report = BuildPipeline.BuildPlayer(new BuildPlayerWithProfileOptions()
+                {
+                    buildProfile = buildProfile,
+                    assetBundleManifestPath = string.Empty,
+                    locationPathName = outputLocation,
+                    options = buildOptions,
+                });
+            }
+            else
+            {
+                report = BuildPipeline.BuildPlayer(buildConfig);
+                BuildLogger.Log(report.ReportMessage());
+            }
+            
+            return report;
         }
 
         private void PrintBuildLog()

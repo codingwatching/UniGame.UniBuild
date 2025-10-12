@@ -1,9 +1,11 @@
 ﻿namespace UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration
 {
     using System;
+    using System.Collections.Generic;
     using UniModules.UniGame.UniBuild;
     using UnityEditor;
     using UnityEditor.Build;
+    using UnityEditor.Build.Profile;
     using UnityEngine;
     using UnityEngine.Serialization;
 
@@ -57,13 +59,21 @@
         [Tooltip("game company name")]
         public string companyName = string.Empty;
 
+        [Tooltip("use custom build profile settings instead of buildin")]
+        public bool useBuildProfile = false;
+        
+#if ODIN_INSPECTOR
+        [ShowIf(nameof(useBuildProfile))]
+#endif
+        public BuildProfile buildProfile;
+
         [FormerlySerializedAs("_buildTarget")]
         [SerializeField]
-        public BuildTarget buildTarget;
+        public BuildTarget buildTarget = BuildTarget.Android;
 
         [FormerlySerializedAs("_buildTargetGroup")]
         [SerializeField]
-        public BuildTargetGroup buildTargetGroup;
+        public BuildTargetGroup buildTargetGroup = BuildTargetGroup.Android;
 
 #if ODIN_INSPECTOR || TRI_INSPECTOR
         [ShowIf(nameof(IsShownStandaloneSubTarget))]
@@ -185,6 +195,12 @@
             }
 
             return false;
+        }
+
+        public void ActivateBuildProfile()
+        {
+            if (buildProfile == null) return;
+            BuildProfile.SetActiveBuildProfile(buildProfile);
         }
     }
 }

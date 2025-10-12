@@ -137,10 +137,9 @@ namespace UniGame.UniBuild.Editor
         public bool Validate(IUniBuilderConfiguration config)
         {
             var buildParameters = config.BuildParameters;
-
+            
             if (BuildData.buildTarget != buildParameters.buildTarget)
                 return false;
-
             if (BuildData.buildTargetGroup!=buildParameters.buildTargetGroup)
                 return false;
             

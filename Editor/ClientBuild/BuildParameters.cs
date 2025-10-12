@@ -8,6 +8,7 @@ namespace UniGame.UniBuild.Editor
     using UniModules;
     using UnityEditor;
     using UnityEditor.Build;
+    using UnityEditor.Build.Profile;
     using UnityEngine;
 
 #if UNITY_WEBGL
@@ -21,6 +22,7 @@ namespace UniGame.UniBuild.Editor
         
         public bool printBuildReport = true;
         
+        public BuildProfile buildProfile;
         public BuildTarget buildTarget;
         public BuildTargetGroup buildTargetGroup;
         public StandaloneBuildSubtarget standaloneBuildSubtarget;
@@ -90,6 +92,7 @@ namespace UniGame.UniBuild.Editor
                 companyName = _buildData.companyName;
             
             printBuildReport=  _buildData.printBuildReport;
+            buildProfile = _buildData.useBuildProfile ? _buildData.buildProfile : null;
             buildTarget      = _buildData.buildTarget;
             buildTargetGroup = _buildData.buildTargetGroup;
             standaloneBuildSubtarget = _buildData.standaloneBuildSubTarget;
