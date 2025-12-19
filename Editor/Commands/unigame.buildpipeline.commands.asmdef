@@ -1,0 +1,46 @@
+{
+    "name": "unigame.buildpipeline.commands",
+    "rootNamespace": "",
+    "references": [
+        "unigame.buildpipeline.editor",
+        "unigame.addressables.editor",
+        "unigame.unieditortools",
+        "unigame.unicore.runtime",
+        "Unity.AddressableImporter.Editor",
+        "Unity.ResourceManager",
+        "Unity.Addressables",
+        "Unity.Addressables.Editor",
+        "Unity.ScriptableBuildPipeline",
+        "Unity.ScriptableBuildPipeline.Editor",
+        "unigame.cipublisher.editor",
+        "Unity.SharpZipLib.Utils",
+        "TriInspector",
+        "TriInspector.Editor",
+        "TriInspector.Editor.Extras",
+        "TriInspector.Editor.Integrations.Odin",
+        "unigame.addressable.atlases.runtime",
+        "AddressablesPlayAssetDelivery.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.codewriter.triinspector",
+            "expression": "",
+            "define": "TRI_INSPECTOR"
+        },
+        {
+            "name": "com.unigame.fluentftp",
+            "expression": "",
+            "define": "ENABLE_FTP_UNICOMMANDS"
+        }
+    ],
+    "noEngineReferences": false
+}

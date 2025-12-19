@@ -14,7 +14,7 @@ namespace UniModules.UniGame.UniBuild
 #endif
     
     [CreateAssetMenu(menuName = "UniBuild/ScriptableCommandsGroup",fileName = nameof(ScriptableCommandsGroup))]
-    public class ScriptableCommandsGroup : UnityBuildCommand, IUnityPreBuildCommand,IUnityPostBuildCommand
+    public class ScriptableCommandsGroup : UnityBuildCommand
     {
         /// <summary>
         /// you can set build arguments with inspector

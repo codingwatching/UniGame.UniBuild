@@ -14,7 +14,7 @@ namespace UniGame.UniBuild.Editor
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild")]
-    public class BuildCommandsGroup : SerializableBuildCommand,IUnityPreBuildCommand,IUnityPostBuildCommand
+    public class BuildCommandsGroup : SerializableBuildCommand
     {
         private const string LogMessageFormat = "GROUP [{0}] : \n{1}";
         
