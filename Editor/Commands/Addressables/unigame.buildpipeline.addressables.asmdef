@@ -1,0 +1,52 @@
+{
+    "name": "unigame.buildpipeline.addressables",
+    "rootNamespace": "",
+    "references": [
+        "unigame.addressable.atlases.runtime",
+        "unigame.buildpipeline.editor",
+        "unigame.addressables.editor",
+        "unigame.unieditortools",
+        "unigame.unicore.runtime",
+        "Unity.AddressableImporter.Editor",
+        "Unity.ResourceManager",
+        "Unity.Addressables",
+        "Unity.Addressables.Editor",
+        "Unity.ScriptableBuildPipeline",
+        "Unity.ScriptableBuildPipeline.Editor",
+        "TriInspector",
+        "TriInspector.Editor",
+        "TriInspector.Editor.Extras",
+        "TriInspector.Editor.Integrations.Odin",
+        "AddressablesPlayAssetDelivery.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "ENABLE_UNITY_ADDRESSABLE",
+        "UNIGAME_ADDRESSABLE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.codewriter.triinspector",
+            "expression": "",
+            "define": "TRI_INSPECTOR"
+        },
+        {
+            "name": "com.unity.addressables",
+            "expression": "",
+            "define": "ENABLE_UNITY_ADDRESSABLE"
+        },
+        {
+            "name": "com.unigame.addressablestools",
+            "expression": "",
+            "define": "UNIGAME_ADDRESSABLE"
+        }
+    ],
+    "noEngineReferences": false
+}
