@@ -1,11 +1,12 @@
 ﻿using System.IO;
 
-namespace UniModules.UniGame.UniBuild.Editor.UpdateVersionCommand 
+namespace UniGame.UniBuild.Editor 
 {
     using System;
     using System.Text;
-    using GitTools.Runtime;
-    using global::UniGame.UniBuild.Editor;
+    using global::UniGame.UniBuild.UpdateVersionCommand;
+    using UniModules;
+    using UniModules.UniGame.GitTools.Runtime;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
@@ -25,11 +26,11 @@ namespace UniModules.UniGame.UniBuild.Editor.UpdateVersionCommand
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
     public class UpdateVersionCommand : SerializableBuildCommand
     {
-        [SerializeField]
-        private int minBuildNumber = 0;
+        public int minBuildNumber = 0;
+        
+        public int incrementBy = 1;
 
-        [SerializeField]
-        private bool appendBranch = false;
+        public bool appendBranch = false;
 
         public bool printBuildVersion = true;
 
@@ -51,8 +52,11 @@ namespace UniModules.UniGame.UniBuild.Editor.UpdateVersionCommand
         public void Execute()
         {
             var branch = appendBranch ?  GitCommands.GetGitBranch() : string.Empty;
-            UpdateBuildVersion(EditorUserBuildSettings.activeBuildTarget, 1, branch);
-            if(printBuildVersion) PrintBuildVersion();
+            var buildNumber = BuildVersionProvider.GetActiveBuildNumber(EditorUserBuildSettings.activeBuildTarget);
+            UpdateBuildVersion(EditorUserBuildSettings.activeBuildTarget,buildNumber , branch);
+            
+            if(printBuildVersion) 
+                PrintBuildVersion();
         }
 
         public void PrintBuildVersion()
@@ -72,15 +76,13 @@ namespace UniModules.UniGame.UniBuild.Editor.UpdateVersionCommand
         
         public void UpdateBuildVersion(BuildTarget buildTarget,int buildNumber, string branch) 
         {
-            var buildVersionProvider = new BuildVersionProvider();
             var logBuilder = new StringBuilder(200);
 
-            var currentBuildNumber = buildVersionProvider.GetActiveBuildNumber(buildTarget);
             var activeBuildNumber  = Mathf.Max(buildNumber, minBuildNumber);
             activeBuildNumber = Mathf.Max(1, activeBuildNumber);
-            var resultBuildNumber  = currentBuildNumber + activeBuildNumber;
+            var resultBuildNumber  = activeBuildNumber + incrementBy;
             
-            var bundleVersion     = buildVersionProvider
+            var bundleVersion     = BuildVersionProvider
                 .GetBuildVersion(buildTarget, PlayerSettings.bundleVersion, resultBuildNumber, branch);
             
             PlayerSettings.bundleVersion = bundleVersion;

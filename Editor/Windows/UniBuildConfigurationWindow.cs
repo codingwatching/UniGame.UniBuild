@@ -5,7 +5,7 @@ using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace UniModules.UniGame.UniBuild.Editor.Windows
+namespace UniGame.UniBuild.Editor.Windows
 {
 
     public class UniBuildConfigurationWindow : OdinEditorWindow

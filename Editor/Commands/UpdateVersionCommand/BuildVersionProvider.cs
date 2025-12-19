@@ -1,4 +1,4 @@
-﻿namespace UniModules.UniGame.UniBuild.Editor.UpdateVersionCommand
+﻿namespace UniGame.UniBuild.UpdateVersionCommand
 {
     using System.Text;
     using UnityEditor;
@@ -6,7 +6,7 @@
     public class BuildVersionProvider
     {
 
-        public string GetBuildVersion(BuildTarget buildTarget,string bundleVersion, int buildNumber, string branch = null) {
+        public static string GetBuildVersion(BuildTarget buildTarget,string bundleVersion, int buildNumber, string branch = null) {
             
             var versionLenght = GetVersionLength(buildTarget);
             var versionPoints = bundleVersion.Split('.');
@@ -33,7 +33,7 @@
             
         }
         
-        public int GetActiveBuildNumber(BuildTarget target) {
+        public static int GetActiveBuildNumber(BuildTarget target) {
 
             var activeVersion = 0;
             
@@ -55,7 +55,7 @@
 
         }
 
-        public int[] GetVersionsFromString(string version)
+        public static int[] GetVersionsFromString(string version)
         {
             if (string.IsNullOrEmpty(version))
                 return new[] { 0, 0, 0, 0 };
@@ -75,7 +75,7 @@
             return versions;
         }
 
-        public int GetVersionLength(BuildTarget buildTarget) {
+        public static int GetVersionLength(BuildTarget buildTarget) {
             var length =  buildTarget == BuildTarget.iOS ? 2 : 3;
             return length;
         }

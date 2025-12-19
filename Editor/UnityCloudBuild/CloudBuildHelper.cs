@@ -9,7 +9,7 @@ namespace UniGame
     using UniBuild.Editor.ClientBuild.BuildConfiguration;
     using UniBuild.Editor;
     using UniBuild.Editor.Extensions;
-    using UniModules.UniGame.UniBuild.Editor.UnityCloudBuild;
+    using UniBuild.Editor.UnityCloudBuild;
     using UnityEditor;
     using UnityEngine;
 

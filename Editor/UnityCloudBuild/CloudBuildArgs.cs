@@ -1,4 +1,4 @@
-namespace UniModules.UniGame.UniBuild.Editor.UnityCloudBuild
+namespace UniGame.UniBuild.Editor.UnityCloudBuild
 {
     using System.Text;
 
