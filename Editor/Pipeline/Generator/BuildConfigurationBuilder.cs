@@ -1,30 +1,30 @@
 ﻿namespace UniGame.UniBuild.Editor
 {
-    using global::UniGame.Runtime.Utils;
-    using UniModules;
-    using UniModules.Editor;
+    using System.Collections.Generic;
+    using Utils;
     using UnityEditor;
+    using UnityEngine;
 
     public class BuildConfigurationBuilder
     {
-        private static MemorizeItem<string, string> _fileContentCache =
-            MemorizeTool.Memorize<string, string>(targetPath =>
-            {
-                if (string.IsNullOrEmpty(targetPath))
-                    return string.Empty;
-
-                var result = FileUtils.ReadContent(targetPath, false);
-                return result.content;
-            });
+        public const string GeneratedContentDefaultPath = "Assets/UniGame.Generated/";
+        
+        private static Dictionary<string, string> _fileContentCache = new();
+        
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void ResetCache()
+        {
+            _fileContentCache.Clear();
+        }
+        
 
         private static string _cloudLocalPath = "UniBuild/Editor/" + CloudBuildMethodsGenerator.ClassFileName;
-        private static string _cloudPath = FileUtils.Combine(EditorPathConstants.GeneratedContentPath, _cloudLocalPath);
+        private static string _cloudPath = FileUtils.Combine(GeneratedContentDefaultPath, _cloudLocalPath);
 
         private static string _menuScript = string.Empty;
         private static string _cloudScript = string.Empty;
 
-        public static string BuildPath => FileUtils
-            .Combine(EditorPathConstants.GeneratedContentPath, "UniBuild/Editor/BuildMethods.cs");
+        public static string BuildPath => FileUtils.Combine(GeneratedContentDefaultPath, "UniBuild/Editor/BuildMethods.cs");
 
         [MenuItem("UniGame/Build Pipeline/Rebuild Menu")]
         public static void RebuildMenuAction()
@@ -63,7 +63,11 @@
 
         public static bool WriteUnityFile(string scriptValue, string path, bool force = false)
         {
-            var content = _fileContentCache[path];
+            if (!_fileContentCache.TryGetValue(path, out var content))
+            {
+                var data = FileUtils.ReadContent(path, false);
+                content = string.IsNullOrEmpty(data.content) ? string.Empty : data.content;
+            }
 
             if (string.IsNullOrEmpty(scriptValue))
                 return false;

@@ -1,7 +1,6 @@
 ﻿namespace UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration
 {
     using System;
-    using System.Collections.Generic;
     using UniModules.UniGame.UniBuild;
     using UnityEditor;
     using UnityEditor.Build;

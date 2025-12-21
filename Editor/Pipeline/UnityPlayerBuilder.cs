@@ -4,10 +4,8 @@
     using System.Collections.Generic;
     using System.Linq;
     using Abstract;
-    using UniModules.Editor;
     using Extensions;
-    using Editor;
-    using UniModules;
+    using Utils;
     using UnityEditor;
     using UnityEditor.Build.Reporting;
 
@@ -74,9 +72,7 @@
         {
             var file   = buildParameters.outputFile;
             var folder = buildParameters.outputFolder;
-            var artifactPath = folder.
-//                CombinePath(buildParameters.BuildTarget.ToString()).
-                CombinePath(file);
+            var artifactPath = folder.CombinePath(file);
             
             buildParameters.artifactPath = artifactPath;
             
@@ -86,18 +82,16 @@
         public IUniBuildCommandsMap SelectActualBuildMap(IUniBuilderConfiguration configuration)
         {
             //load build command maps
-            var commandsMapsResources = AssetEditorTools.
-                GetEditorResources<UniBuildPipeline>();
+            var commandsMapsResources = AssetEditorTools.GetAssets<UniBuildPipeline>();
             
             //filter all valid commands map
             foreach (var mapResource in commandsMapsResources) {
 
-                var commandMap = mapResource.Load<IUniBuildCommandsMap>();
-                if(!commandMap.Validate(configuration) ) 
+                if(!mapResource.Validate(configuration) ) 
                     continue;
                 
-                BuildLogger.Log($"SELECT BUILD MAP {commandMap.ItemName}");
-                return commandMap;
+                BuildLogger.Log($"SELECT BUILD MAP {mapResource.ItemName}");
+                return mapResource;
             }
 
             return null;

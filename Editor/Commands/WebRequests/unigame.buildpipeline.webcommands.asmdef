@@ -1,7 +1,9 @@
 {
-    "name": "unigame.buildpipeline.commands",
+    "name": "unigame.buildpipeline.webcommands",
     "rootNamespace": "",
     "references": [
+        "unigame.unieditortools",
+        "unigame.unicore.runtime",
         "unigame.buildpipeline.editor",
         "unigame.cipublisher.editor",
         "TriInspector",

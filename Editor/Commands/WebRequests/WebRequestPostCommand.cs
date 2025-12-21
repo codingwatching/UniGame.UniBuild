@@ -1,14 +1,13 @@
-﻿using UniGame.Runtime.Extension;
-
-namespace UniGame.BuildCommands.Editor
+﻿namespace UniGame.BuildCommands.Editor
 {
     using System;
-    using global::UniGame.Utils;
     using global::UniGame.UniBuild.Editor;
+    using Runtime.Extension;
     using UniBuild.Editor.Inspector;
     using UnityEngine;
     using UnityEngine.Networking;
     using UnityEngine.Scripting.APIUpdating;
+    using Utils;
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.BuildCommands.Editor.WebRequests")]

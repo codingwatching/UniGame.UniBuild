@@ -90,8 +90,11 @@ UniGame.UniBuild is a comprehensive build automation system for Unity that provi
 ### Dependencies
 
 **Optional for enhanced Inspector:**
+
 - [Odin Inspector](https://odininspector.com) - Advanced inspector features
 - [Tri-Inspector](https://github.com/codewriter-packages/Tri-Inspector) - Lightweight alternative
+
+Wuthout these, you can use Pipeline Editor Window or default Unity Inspector for editing pipelines.
 
 ### Package Installation
 
@@ -101,8 +104,6 @@ Add to your project manifest (`Packages/manifest.json`):
 {
   "dependencies": {
     "com.unigame.unibuildpipeline": "https://github.com/UnioGame/unigame.buildpipeline.git",
-    "com.unigame.unicore": "https://github.com/UnioGame/unigame.core.git",
-    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
   }
 }
 ```

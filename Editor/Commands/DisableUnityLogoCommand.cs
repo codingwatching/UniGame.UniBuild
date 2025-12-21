@@ -1,6 +1,4 @@
-﻿using UniGame.Core.Runtime;
-
-namespace UniGame.UniBuild.Editor.Commands {
+﻿namespace UniGame.UniBuild.Editor.Commands {
     using System;
     using Editor;
     using Inspector;
@@ -22,9 +20,8 @@ namespace UniGame.UniBuild.Editor.Commands {
         description: "Configures splash screen settings including enabling/disabling the splash screen and Unity logo visibility.",
         category: "Player Settings"
     )]
-    public class DisableUnityLogoCommand : SerializableBuildCommand, ICommand
+    public class DisableUnityLogoCommand : SerializableBuildCommand
     {
-
         public bool enableSplashScreen = false;
 
         public bool showUnityLogo = false;

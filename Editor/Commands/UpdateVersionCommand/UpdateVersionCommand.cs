@@ -6,11 +6,10 @@ namespace UniGame.UniBuild.Editor
     using System.Text;
     using global::UniGame.UniBuild.UpdateVersionCommand;
     using Inspector;
-    using UniModules;
-    using UniModules.UniGame.GitTools.Runtime;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
+    using Utils;
 
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;

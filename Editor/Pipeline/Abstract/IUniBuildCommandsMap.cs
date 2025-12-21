@@ -3,12 +3,10 @@ using System.Collections.Generic;
 
 namespace UniGame.UniBuild.Editor.Abstract
 {
-    using global::UniGame.Core.Runtime;
-    using global::UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration;
+    using ClientBuild.BuildConfiguration;
 
     public interface IUniBuildCommandsMap : 
-        IUnityBuildCommandValidator,
-        INamedItem
+        IUnityBuildCommandValidator
     {
         public bool PlayerBuildEnabled { get; }
   

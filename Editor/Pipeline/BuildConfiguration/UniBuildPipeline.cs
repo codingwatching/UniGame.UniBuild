@@ -6,11 +6,10 @@ namespace UniGame.UniBuild.Editor
     using System;
     using System.Collections.Generic;
     using Abstract;
-    using Runtime.ObjectPool;
-    using global::UniGame.Runtime.ObjectPool.Extensions;
     using ClientBuild.BuildConfiguration;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.Pool;
 
 #if ODIN_INSPECTOR
      using Sirenix.OdinInspector;
@@ -111,9 +110,10 @@ namespace UniGame.UniBuild.Editor
         }
 
         public IEnumerable<T> LoadCommands<T>(Func<T,bool> filter = null)
-            where T : IUnityBuildCommand 
+            where T : IUnityBuildCommand
         {
-            var commandsBuffer = ClassPool.Spawn<List<IUnityBuildCommand>>();
+            var commandsBuffer = ListPool<IUnityBuildCommand>.Get();
+            commandsBuffer.Clear(); 
             commandsBuffer.AddRange(PreBuildCommands);
             commandsBuffer.AddRange(PostBuildCommands);
 
@@ -130,7 +130,8 @@ namespace UniGame.UniBuild.Editor
                 yield return targetCommand;
             }
 
-            commandsBuffer.Despawn();
+            commandsBuffer.Clear();
+            ListPool<IUnityBuildCommand>.Release(commandsBuffer);
         }
         
 
@@ -212,7 +213,8 @@ namespace UniGame.UniBuild.Editor
 
         private IEnumerable<IUnityBuildCommand> FilterActiveCommands(IEnumerable<BuildCommandStep> commands)
         {
-            var commandsBuffer = ClassPool.Spawn<List<IUnityBuildCommand>>();
+            var commandsBuffer = ListPool<IUnityBuildCommand>.Get();
+            commandsBuffer.Clear();
 
             foreach (var command in commands) {
                 commandsBuffer.AddRange(command.GetCommands());

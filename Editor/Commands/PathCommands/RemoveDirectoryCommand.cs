@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UniGame.Core.Runtime.Extension;
 using UnityEditor;
 using UnityEngine;
 
@@ -49,9 +48,10 @@ namespace UniBuild.Commands.Editor
             
             AssetDatabase.Refresh();
 
-            assetPath
-                .Where(File.Exists)
-                .ForEach(x => { TryAction(() => File.Delete(x)); });
+            foreach (var path in assetPath.Where(File.Exists))
+            {
+                TryAction(() => File.Delete(path)); 
+            }
 
             AssetDatabase.Refresh();
         }

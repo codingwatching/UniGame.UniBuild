@@ -1,8 +1,8 @@
 ﻿namespace UniGame.UniBuild.Editor.Extensions
 {
     using System.Linq;
-    using global::UniGame.UniBuild.Editor.ClientBuild;
-    using global::UniGame.UniBuild.Editor;
+    using ClientBuild;
+    using Editor;
     using Parsers;
     using UnityEditor;
 

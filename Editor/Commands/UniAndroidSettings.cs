@@ -1,7 +1,6 @@
 ﻿namespace UniGame.UniBuild.Editor.Commands
 {
     using System;
-    using global::UniCore.Runtime.Attributes;
     using UnityEditor;
     using UnityEngine;
     using AndroidArchitecture = UnityEditor.AndroidArchitecture;

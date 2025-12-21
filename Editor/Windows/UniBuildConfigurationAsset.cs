@@ -2,8 +2,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using UniModules.Editor;
 using UniGame.UniBuild.Editor;
+using UniGame.UniBuild.Editor.Utils;
 using UnityEngine;
 
 #if ODIN_INSPECTOR
@@ -39,6 +39,7 @@ public class UniBuildConfigurationAsset : ScriptableObject
     public UniBuildConfigurationAsset Refresh()
     {
         configurations.Clear();
+        
         var configs = AssetEditorTools
             .GetAssets<UniBuildPipeline>()
             .Select(x => new UniBuildItem(){buildCommands = x});

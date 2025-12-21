@@ -2,9 +2,8 @@
 
 namespace UniGame.UniBuild.Editor
 {
-    using UniModules.Editor;
-    using global::UniGame.Core.Runtime.Extension;
     using UnityEngine;
+    using Utils;
 
     public class CloudBuildMethodsGenerator
     {
