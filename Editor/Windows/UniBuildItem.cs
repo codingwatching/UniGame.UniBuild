@@ -24,7 +24,7 @@ public class UniBuildItem
 #if ODIN_INSPECTOR
     [HorizontalGroup(nameof(UniBuildItem))]
 #endif
-    public UniBuildCommandsMap buildCommands;
+    public UniBuildPipeline buildCommands;
 
     public string Name => buildCommands == null ? string.Empty : buildCommands.name;
     

@@ -42,7 +42,7 @@
         public string[] GetBuildMethods()
         {
             var map = new List<string>();
-            var commands = AssetEditorTools.GetAssets<UniBuildCommandsMap>();
+            var commands = AssetEditorTools.GetAssets<UniBuildPipeline>();
             foreach (var command in commands) {
                 map.Add(CreateBuildMethod(MenuTemplate,BuildTemplate,nameof(UniBuildTool.BuildByConfigurationId),command));
             }
@@ -52,7 +52,7 @@
             return map.ToArray();
         }
 
-        public string CreateBuildMethod(string template,string menuTemplate,string buildMethod,UniBuildCommandsMap config)
+        public string CreateBuildMethod(string template,string menuTemplate,string buildMethod,UniBuildPipeline config)
         {
             var name = config.ItemName.RemoveSpecialAndDotsCharacters();
             var id = config.GetGUID();

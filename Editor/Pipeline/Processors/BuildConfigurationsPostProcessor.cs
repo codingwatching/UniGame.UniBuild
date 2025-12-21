@@ -16,7 +16,7 @@ namespace UniGame.UniBuild.Editor
         {
             AssemblyReloadEvents.afterAssemblyReload += () =>
             {
-                var assets = AssetEditorTools.GetAssets<UniBuildCommandsMap>();
+                var assets = AssetEditorTools.GetAssets<UniBuildPipeline>();
                 commandsMapPaths.Clear();
                 commandsMapPaths.AddRange(assets.Select(AssetDatabase.GetAssetPath));
             };

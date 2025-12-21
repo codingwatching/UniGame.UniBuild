@@ -56,7 +56,7 @@ namespace UniGame.UniBuild.Editor
         {
             var methodsTextAsset = LoadMethodsTemplate();
             
-            var commands = AssetEditorTools.GetAssets<UniBuildCommandsMap>();
+            var commands = AssetEditorTools.GetAssets<UniBuildPipeline>();
 
             var methodsValue = string.Empty;
             

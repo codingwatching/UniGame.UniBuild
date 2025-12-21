@@ -6,9 +6,9 @@ namespace UniGame.UniBuild.Editor
     using System;
     using System.Collections.Generic;
     using Abstract;
-    using global::UniGame.Runtime.ObjectPool;
+    using Runtime.ObjectPool;
     using global::UniGame.Runtime.ObjectPool.Extensions;
-    using global::UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration;
+    using ClientBuild.BuildConfiguration;
     using UnityEditor;
     using UnityEngine;
 
@@ -21,7 +21,7 @@ namespace UniGame.UniBuild.Editor
 #endif
 
     [CreateAssetMenu(menuName = "UniBuild/UniBuildConfiguration",fileName = "UniGame Builder")]
-    public class UniBuildCommandsMap : ScriptableObject, IUniBuildCommandsMap
+    public class UniBuildPipeline : ScriptableObject, IUniBuildCommandsMap
     {
         public const string SettingsTabKey = "settings";
         public const string CommandsTabKey = "commands";

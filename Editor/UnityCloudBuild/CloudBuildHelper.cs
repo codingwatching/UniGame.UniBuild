@@ -32,7 +32,7 @@ namespace UniGame
 
             var guid = "%BUILDMAP-GUID%";
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var configuration = AssetDatabase.LoadAssetAtPath<UniBuildCommandsMap>(assetPath);
+            var configuration = AssetDatabase.LoadAssetAtPath<UniBuildPipeline>(assetPath);
 
             var isCloudBuild = false;
 #if UNITY_CLOUD_BUILD
@@ -72,7 +72,7 @@ namespace UniGame
 
             var guid = "%BUILDMAP-GUID%";
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var configuration = AssetDatabase.LoadAssetAtPath<UniBuildCommandsMap>(assetPath);
+            var configuration = AssetDatabase.LoadAssetAtPath<UniBuildPipeline>(assetPath);
             builder.ExecuteCommands(configuration.PostBuildCommands, x => x.Execute(parameters));
         }
         

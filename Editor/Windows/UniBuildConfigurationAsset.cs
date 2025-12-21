@@ -40,7 +40,7 @@ public class UniBuildConfigurationAsset : ScriptableObject
     {
         configurations.Clear();
         var configs = AssetEditorTools
-            .GetAssets<UniBuildCommandsMap>()
+            .GetAssets<UniBuildPipeline>()
             .Select(x => new UniBuildItem(){buildCommands = x});
         
         configurations.AddRange(configs);

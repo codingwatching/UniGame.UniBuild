@@ -38,14 +38,14 @@ namespace UniGame.UniBuild.Editor
         public static void BuildByConfigurationId(string guid)
         {
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var asset     = AssetDatabase.LoadAssetAtPath<UniBuildCommandsMap>(assetPath);
+            var asset     = AssetDatabase.LoadAssetAtPath<UniBuildPipeline>(assetPath);
             UniBuildTool.ExecuteBuild(asset);
         }
         
         public static void BuildAndRunByConfigurationId(string guid)
         {
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var asset     = AssetDatabase.LoadAssetAtPath<UniBuildCommandsMap>(assetPath);
+            var asset     = AssetDatabase.LoadAssetAtPath<UniBuildPipeline>(assetPath);
             var instance = Object.Instantiate(asset);
             instance.BuildData.buildOptions |= BuildOptions.AutoRunPlayer;
             UniBuildTool.ExecuteBuild(instance);

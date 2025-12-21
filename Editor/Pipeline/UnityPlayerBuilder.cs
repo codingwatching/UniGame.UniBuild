@@ -87,7 +87,7 @@
         {
             //load build command maps
             var commandsMapsResources = AssetEditorTools.
-                GetEditorResources<UniBuildCommandsMap>();
+                GetEditorResources<UniBuildPipeline>();
             
             //filter all valid commands map
             foreach (var mapResource in commandsMapsResources) {
