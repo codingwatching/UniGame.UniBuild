@@ -12,8 +12,8 @@
 
         public const string ClassTemplate = "namespace UniGame.UniBuild\n{{ \n{0} \npublic static class {1} \n{{ \n{2}\n }} }}";
         
-        private const string MenuTemplate = "[MenuItem(\"UniGame/Uni Build/{0}_Build\")]\n";
-        private const string MenuAndRunTemplate = "[MenuItem(\"UniGame/Uni Build/{0}_Build_And_Run\")]\n";
+        private const string MenuTemplate = "[MenuItem(\"UniGame/Build Pipeline/{0}_Build\")]\n";
+        private const string MenuAndRunTemplate = "[MenuItem(\"UniGame/Build Pipeline/{0}_Build_And_Run\")]\n";
         private const string BuildTemplate = " Build_{0}";
         private const string BuildAndRunTemplate = " BuildAndRun_{0}";
         private const string ClassName = "UniPlatformBuilder";

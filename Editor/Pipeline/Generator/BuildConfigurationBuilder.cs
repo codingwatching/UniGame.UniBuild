@@ -26,7 +26,7 @@
         public static string BuildPath => FileUtils
             .Combine(EditorPathConstants.GeneratedContentPath, "UniBuild/Editor/BuildMethods.cs");
 
-        [MenuItem("UniGame/Uni Build/Rebuild Menu")]
+        [MenuItem("UniGame/Build Pipeline/Rebuild Menu")]
         public static void RebuildMenuAction()
         {
             Rebuild(true);

@@ -62,7 +62,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         private VisualElement _draggedElementVisual;
         private VisualElement _draggedElementClone;
 
-        [MenuItem("UniGame/Uni Build/Pipeline Editor")]
+        [MenuItem("UniGame/Build Pipeline/Pipeline Editor")]
         public static void ShowWindow()
         {
             var window = GetWindow<BuildPipelineEditorWindow>();

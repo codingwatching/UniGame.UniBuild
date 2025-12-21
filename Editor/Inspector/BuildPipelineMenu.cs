@@ -9,13 +9,13 @@ namespace UniGame.UniBuild.Editor.Inspector
     /// </summary>
     public static class BuildPipelineMenu
     {
-        [MenuItem("UniGame/Uni Build/Pipeline Editor", priority = 10)]
+        [MenuItem("UniGame/Build Pipeline/Pipeline Editor", priority = 100)]
         public static void OpenPipelineEditor()
         {
             BuildPipelineEditorWindow.ShowWindow();
         }
 
-        [MenuItem("UniGame/Uni Build/Create Pipeline...", priority = 20)]
+        [MenuItem("UniGame/Build Pipeline/Create Pipeline...", priority = 20)]
         public static void CreateNewPipeline()
         {
             var folderPath = "Assets/BuildPipelines";
@@ -30,7 +30,7 @@ namespace UniGame.UniBuild.Editor.Inspector
             Selection.activeObject = pipeline;
         }
 
-        [MenuItem("UniGame/Uni Build/Find Pipelines", priority = 30)]
+        [MenuItem("UniGame/Build Pipeline/Find Pipelines", priority = 30)]
         public static void FindAllPipelines()
         {
             var pipelines = PipelineManager.LoadAllPipelines();
@@ -57,7 +57,7 @@ namespace UniGame.UniBuild.Editor.Inspector
             }
         }
 
-        [MenuItem("UniGame/Uni Build/Command Catalog", priority = 40)]
+        [MenuItem("UniGame/Build Pipeline/Command Catalog", priority = 40)]
         public static void ShowCommandCatalog()
         {
             var window = EditorWindow.GetWindow<BuildPipelineEditorWindow>();
