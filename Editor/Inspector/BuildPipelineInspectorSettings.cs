@@ -11,6 +11,7 @@ namespace UniGame.UniBuild.Editor.Inspector
     /// Settings for the Build Pipeline Inspector editor
     /// Stored as ScriptableSingleton to persist user preferences in project settings
     /// </summary>
+    [FilePath("ProjectSettings/Uni Build Pipeline/BuildPipelineInspectorSettings.asset", FilePathAttribute.Location.ProjectFolder)]
     public class BuildPipelineInspectorSettings : ScriptableSingleton<BuildPipelineInspectorSettings>
     {
         [SerializeField]
@@ -27,12 +28,6 @@ namespace UniGame.UniBuild.Editor.Inspector
 
         [SerializeField]
         private bool enableDetailedLogging = false;
-
-        private BuildPipelineInspectorSettings()
-        {
-            // Private constructor to prevent direct instantiation
-            // ScriptableSingleton handles creation internally
-        }
 
         /// <summary>
         /// Default path for creating new pipelines
@@ -114,24 +109,8 @@ namespace UniGame.UniBuild.Editor.Inspector
                 }
             }
         }
+        
+        public void Save() => Save(true);
 
-        /// <summary>
-        /// Get the singleton instance (automatically created if needed)
-        /// </summary>
-        public static BuildPipelineInspectorSettings GetSettings()
-        {
-            // Access instance property to ensure singleton is loaded
-            // This is safe to call after initialization
-            return instance;
-        }
-
-        /// <summary>
-        /// Check if the singleton has been initialized
-        /// </summary>
-        public static bool IsInitialized()
-        {
-            // Check if instance has been created without triggering lazy initialization
-            return instance != null;
-        }
     }
 }

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using global::UniGame.UniBuild.Editor;
+    using UniBuild.Editor.Inspector;
     using UnityEditor.AddressableAssets;
     using UnityEditor.AddressableAssets.Settings;
     using UnityEngine.Scripting.APIUpdating;
@@ -17,6 +18,11 @@
     
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands.AddressablesCommands")]
+    [BuildCommandMetadata(
+        displayName: "Addressables Build",
+        description: "Builds Addressables content bundles and catalogs using the specified data builder, generating the necessary files for asset delivery and content updates.",
+        category: "Addressables"
+    )]
     public class AddressablesBuildCommand : SerializableBuildCommand
     {
 #if ODIN_INSPECTOR

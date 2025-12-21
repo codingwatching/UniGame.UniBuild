@@ -1,5 +1,6 @@
 using System;
 using UniGame.UniBuild.Editor;
+using UniGame.UniBuild.Editor.Inspector;
 using UnityEditor;
 using UnityEngine.Scripting.APIUpdating;
 
@@ -13,6 +14,11 @@ using TriInspector;
 
 [Serializable]
 [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+[BuildCommandMetadata(
+    displayName: "Player Settings",
+    description: "Configures player build settings including incremental IL2CPP compilation for optimized build times.",
+    category: "Player Settings"
+)]
 public class PlayerSettingsCommand : SerializableBuildCommand
 {
     public bool setIncrementalIl2CppBuild = true;

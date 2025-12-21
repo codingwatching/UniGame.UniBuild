@@ -8,6 +8,11 @@ using UnityEngine;
 
 
 [Serializable]
+[BuildCommandMetadata(
+    displayName: "Rezip Android Debug Symbols",
+    description: "Processes and recompresses Android debug symbol files (.symbols.zip) for specified architectures, optimizing symbol file distribution and storage for Android builds.",
+    category: "Android"
+)]
 public class RezipAndroidDebugSymbolsCommand : SerializableBuildCommand
 {
     [SerializeField]

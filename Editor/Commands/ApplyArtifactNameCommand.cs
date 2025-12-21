@@ -3,6 +3,7 @@
     using System;
     using System.IO;
     using Editor;
+    using Inspector;
     using UniModules.UniGame.GitTools.Runtime;
     using UnityEditor;
     using UnityEngine;
@@ -19,6 +20,11 @@
     [Serializable]
     [MovedFrom(true,sourceClassName:"ApplyArtifactNameWithVersionCommand",
         sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Apply Artifact Name",
+        description: "Sets the build output artifact name (executable, APK, IPA, etc.) using configurable naming patterns and parameters.",
+        category: "Build Configuration"
+    )]
     public class ApplyArtifactNameCommand : SerializableBuildCommand
     {
         private const string nameFormatTemplate = "{0}-{1}";

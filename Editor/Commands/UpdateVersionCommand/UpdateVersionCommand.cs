@@ -5,6 +5,7 @@ namespace UniGame.UniBuild.Editor
     using System;
     using System.Text;
     using global::UniGame.UniBuild.UpdateVersionCommand;
+    using Inspector;
     using UniModules;
     using UniModules.UniGame.GitTools.Runtime;
     using UnityEditor;
@@ -20,10 +21,15 @@ namespace UniGame.UniBuild.Editor
 #endif
     
     /// <summary>
-    /// update current project version
+    /// Updates current project version with configurable build number increments and branch appending.
     /// </summary>
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Update Version",
+        description: "Updates the project build version number by incrementing it according to specified parameters. Supports appending git branch information and writing version to a file for tracking build history.",
+        category: "Version Management"
+    )]
     public class UpdateVersionCommand : SerializableBuildCommand
     {
         public int minBuildNumber = 0;

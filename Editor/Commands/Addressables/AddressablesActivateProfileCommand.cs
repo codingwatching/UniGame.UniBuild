@@ -6,7 +6,7 @@ namespace UniGame.BuildCommands.Editor
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    
+    using UniBuild.Editor.Inspector;
     using UniModules.Editor;
     using UnityEditor;
     using UnityEditor.AddressableAssets.Settings;
@@ -14,6 +14,11 @@ namespace UniGame.BuildCommands.Editor
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.BuildCommands.Editor.Addressables")]
+    [BuildCommandMetadata(
+        displayName: "Addressables Activate Profile",
+        description: "Activates a specific Addressables build profile, determining which content delivery network (CDN) or storage configuration is used for remote content delivery.",
+        category: "Addressables"
+    )]
     public class AddressablesActivateProfileCommand : SerializableBuildCommand
     {
         private AddressableAssetSettings addressableAssetSettings;

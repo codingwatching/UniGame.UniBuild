@@ -2,15 +2,21 @@
 {
     using System;
     using Editor;
+    using Inspector;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
 
     /// <summary>
-    /// update current project version
+    /// Sets the scripting backend (Mono, IL2CPP) for the build
     /// </summary>
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Set Scripting Backend",
+        description: "Configures the scripting backend engine (Mono2x or IL2CPP) used for compilation, affecting performance and compatibility.",
+        category: "Build Configuration"
+    )]
     public class SetScriptingBackendCommand : SerializableBuildCommand
     {
         [SerializeField]

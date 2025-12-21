@@ -11,6 +11,11 @@ namespace UniGame.BuildCommands.Editor
     using UnityEngine;
     
     [Serializable]
+    [BuildCommandMetadata(
+        displayName: "Google Play Distribution",
+        description: "Distributes Android builds to Google Play Console, handling APK/AAB upload, release track assignment, and automated rollout management for Android app publishing.",
+        category: "Distribution"
+    )]
     public class GooglePlayDistributionCommand : UnitySerializablePostBuildCommand
     {
 #if ODIN_INSPECTOR

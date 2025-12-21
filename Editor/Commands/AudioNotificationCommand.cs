@@ -3,6 +3,7 @@
     using System;
     using System.Reflection;
     using global::UniGame.UniBuild.Editor;
+    using global::UniGame.UniBuild.Editor.Inspector;
     using UnityEditor;
     using UnityEngine;
 
@@ -11,6 +12,11 @@
 #endif
     
     [Serializable]
+    [BuildCommandMetadata(
+        displayName: "Audio Notification",
+        description: "Plays an audio notification when the build process completes, with customizable title, message, and notification sound.",
+        category: "Notifications"
+    )]
     public class AudioNotificationCommand : SerializableBuildCommand
     {
         public string title = "Build Finished";

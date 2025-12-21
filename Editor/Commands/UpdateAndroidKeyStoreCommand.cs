@@ -3,6 +3,7 @@
     using System;
     using System.Text;
     using Editor;
+    using Inspector;
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
@@ -17,6 +18,11 @@
     
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Update Android KeyStore",
+        description: "Configures the Android signing keystore settings, including debug/release keystore selection, keystore file paths, passwords, and key aliases for APK/AAB signing.",
+        category: "Android"
+    )]
     public class UpdateAndroidKeyStoreCommand : SerializableBuildCommand
     {
         [Space]

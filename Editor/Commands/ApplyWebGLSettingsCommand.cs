@@ -3,6 +3,7 @@
     using System;
     using ClientBuild.BuildConfiguration;
     using Editor;
+    using Inspector;
     using UnityEditor;
     using UnityEngine.Scripting.APIUpdating;
 
@@ -15,6 +16,11 @@
     
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Apply WebGL Settings",
+        description: "Configures WebGL platform-specific build settings including memory size, compression, exception support, and debug symbol mode.",
+        category: "WebGL"
+    )]
     public class ApplyWebGLSettingsCommand : SerializableBuildCommand
     {
         public WebGlBuildData webGlBuildData = new();

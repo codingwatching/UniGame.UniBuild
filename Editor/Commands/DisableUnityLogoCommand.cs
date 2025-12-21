@@ -3,6 +3,7 @@
 namespace UniGame.UniBuild.Editor.Commands {
     using System;
     using Editor;
+    using Inspector;
     using UnityEditor;
     using UnityEngine.Scripting.APIUpdating;
 
@@ -16,6 +17,11 @@ namespace UniGame.UniBuild.Editor.Commands {
     
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Disable Unity Logo",
+        description: "Configures splash screen settings including enabling/disabling the splash screen and Unity logo visibility.",
+        category: "Player Settings"
+    )]
     public class DisableUnityLogoCommand : SerializableBuildCommand, ICommand
     {
 

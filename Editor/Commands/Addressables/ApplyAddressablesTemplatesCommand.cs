@@ -4,12 +4,18 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using UniBuild.Editor.Inspector;
     using UniModules.Editor;
     using UnityEditor;
     using UnityEditor.AddressableAssets;
     using UnityEngine;
 
     [Serializable]
+    [BuildCommandMetadata(
+        displayName: "Apply Addressables Templates",
+        description: "Applies Addressables group templates and rules, automatically organizing assets into groups based on configurable pattern matching and naming conventions.",
+        category: "Addressables"
+    )]
     public class ApplyAddressablesTemplatesCommand
     {
 #if ODIN_INSPECTOR

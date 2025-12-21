@@ -2,6 +2,7 @@
 {
     using System;
     using Commands;
+    using Inspector;
     using UnityEditor;
     using UnityEditor.Build;
     using UnityEngine.Scripting.APIUpdating;
@@ -20,6 +21,11 @@
     
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Apply Android Settings",
+        description: "Configures Android-specific build settings including debug symbols, profiler connection, texture compression, and symbol encryption.",
+        category: "Android"
+    )]
     public class ApplyAndroidSettingsCommand : SerializableBuildCommand
     {
 #if ODIN_INSPECTOR || TRI_INSPECTOR

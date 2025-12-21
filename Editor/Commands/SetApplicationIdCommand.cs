@@ -1,5 +1,6 @@
 namespace UniGame.UniBuild.Editor.Commands
 {
+    using Inspector;
     using UnityEditor;
     
 #if ODIN_INSPECTOR
@@ -10,6 +11,11 @@ namespace UniGame.UniBuild.Editor.Commands
     using TriInspector;
 #endif
     
+    [BuildCommandMetadata(
+        displayName: "Set Application ID",
+        description: "Sets the application identifier (bundle ID) for the build, typically in the format com.company.product.",
+        category: "Player Settings"
+    )]
     public class SetApplicationIdCommand : UnityBuildCommand
     {
         public string applicationId = "com.company.product";

@@ -16,7 +16,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// </summary>
         public static IEnumerable<Type> FindAllCommands()
         {
-            return TypeCache.GetTypesDerivedFrom<SerializableBuildCommand>();
+            return TypeCache.GetTypesDerivedFrom<IUnityBuildCommand>();
         }
 
         /// <summary>

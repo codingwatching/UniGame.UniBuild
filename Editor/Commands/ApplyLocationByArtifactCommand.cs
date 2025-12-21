@@ -5,11 +5,17 @@ namespace UniGame.UniBuild.Editor.Commands
     using UnityEditor;
     using System;
     using Editor;
+    using Inspector;
     using UniModules;
     using UnityEngine.Scripting.APIUpdating;
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Apply Build Location by Artifact",
+        description: "Configures the build output directory path based on the artifact name and platform-specific conventions.",
+        category: "Build Configuration"
+    )]
     public class ApplyLocationByArtifactCommand : SerializableBuildCommand
     {
 

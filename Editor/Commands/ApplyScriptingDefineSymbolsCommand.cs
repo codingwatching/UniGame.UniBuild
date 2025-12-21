@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Text;
     using Editor;
+    using Inspector;
     using UnityEditor;
     using UnityEditor.Build;
     using UnityEngine;
@@ -20,6 +21,11 @@
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Apply Scripting Define Symbols",
+        description: "Manages conditional compilation symbols for different build targets and configurations, enabling platform-specific code compilation.",
+        category: "Build Configuration"
+    )]
     public class ApplyScriptingDefineSymbolsCommand : SerializableBuildCommand
     {
         private const string DefinesSeparator = ";";

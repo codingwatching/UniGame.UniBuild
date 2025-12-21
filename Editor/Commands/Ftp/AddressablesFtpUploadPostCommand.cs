@@ -21,6 +21,11 @@
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.BuildCommands.Editor.Ftp")]
+    [BuildCommandMetadata(
+        displayName: "Addressables FTP Upload",
+        description: "Uploads Addressables build outputs and assets to a remote FTP server with configurable connection settings, directory mappings, and file filtering options.",
+        category: "Distribution"
+    )]
     public class AddressablesFtpUploadPostCommand : SerializableBuildCommand
     {
         public string disableArgument = "-disableFtpUpload";

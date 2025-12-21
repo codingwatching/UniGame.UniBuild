@@ -2,16 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
+    using Inspector;
     using UnityEditor;
     using UnityEngine.Scripting.APIUpdating;
     using Object = UnityEngine.Object;
 
     /// <summary>
-    /// reimport target assets locations
-    /// or target assets
+    /// Reimports target assets locations or specific assets to refresh their state.
     /// </summary>
     [MovedFrom(sourceNamespace:"UniGame.UniBuild.Editor.Commands.AssetsCommands")]
     [Serializable]
+    [BuildCommandMetadata(
+        displayName: "Reimport Assets",
+        description: "Refreshes the import state of specified assets or asset folders, reprocessing them with current import settings. Useful for updating assets after changing import configuration.",
+        category: "Asset Management"
+    )]
     public class ReimportAssetsCommand : SerializableBuildCommand
     {
         public List<Object> assets = new();

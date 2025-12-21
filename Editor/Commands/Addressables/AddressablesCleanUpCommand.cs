@@ -4,6 +4,7 @@ namespace UniGame.BuildCommands.Editor
 {
     using System;
     using global::UniGame.UniBuild.Editor;
+    using UniBuild.Editor.Inspector;
     using UnityEditor.Build.Pipeline.Utilities;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
@@ -18,6 +19,11 @@ namespace UniGame.BuildCommands.Editor
     
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.BuildCommands.Editor.Addressables")]
+    [BuildCommandMetadata(
+        displayName: "Addressables Cleanup",
+        description: "Cleans up Addressables build artifacts and caches, removing generated content bundles, build pipeline cache, and temporary files to free disk space or reset build state.",
+        category: "Addressables"
+    )]
     public class AddressablesCleanUpCommand : SerializableBuildCommand
     {
         public string CleanUpArgument = "-addressableCleanUp";

@@ -9,11 +9,17 @@ using UnityEngine;
 namespace UniBuild.Commands.Editor
 {
     using global::UniGame.UniBuild.Editor;
+    using UniGame.UniBuild.Editor.Inspector;
     using UnityEngine.Scripting.APIUpdating;
     using UnityEngine.Serialization;
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniBuild.Commands.Editor.PathCommands")]
+    [BuildCommandMetadata(
+        displayName: "Remove Directory",
+        description: "Deletes specified directories or asset paths, removing build artifacts, temporary files, or previous build outputs to clean up the project.",
+        category: "File Management"
+    )]
     public class RemoveDirectoryCommand : SerializableBuildCommand
     {
         [FormerlySerializedAs("folderPath")]

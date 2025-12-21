@@ -2,6 +2,7 @@
 {
     using System;
     using Editor;
+    using Inspector;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
 
@@ -16,6 +17,11 @@
     [Serializable]
     [CreateAssetMenu(menuName = "UniBuild/Commands/DefineSymbolsAssetCommand",fileName = nameof(DefineSymbolsAssetCommand))]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild.Editor.ClientBuild.Commands.PreBuildCommands")]
+    [BuildCommandMetadata(
+        displayName: "Define Symbols Asset",
+        description: "ScriptableObject wrapper for applying scripting define symbols, managing platform-specific conditional compilation symbols.",
+        category: "Build Configuration"
+    )]
     public class DefineSymbolsAssetCommand : UnityBuildCommand
     {
         [SerializeField]

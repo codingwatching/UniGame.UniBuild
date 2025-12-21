@@ -3,6 +3,7 @@
     using System;
     using global::UniGame.AddressableAtlases;
     using global::UniGame.UniBuild.Editor;
+    using UniBuild.Editor.Inspector;
     using UniModules.Editor;
     using UnityEngine.Scripting.APIUpdating;
 
@@ -12,6 +13,11 @@
     
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.BuildCommands.Editor.Addressables")]
+    [BuildCommandMetadata(
+        displayName: "Rebuild Addressables Atlases",
+        description: "Rebuilds Addressables texture and sprite atlases, repacking textures for optimal memory usage and batching in Addressables asset bundles.",
+        category: "Addressables"
+    )]
     public class RebuildAddressablesAtlasesCommand : SerializableBuildCommand
     {
         public override void Execute(IUniBuilderConfiguration buildParameters)

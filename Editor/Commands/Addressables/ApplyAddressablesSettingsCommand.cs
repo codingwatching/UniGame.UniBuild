@@ -5,11 +5,17 @@ namespace UniModules.UniBuild.Commands
 {
     using System;
     using global::UniGame.UniBuild.Editor;
+    using global::UniGame.UniBuild.Editor.Inspector;
     using UnityEditor.AddressableAssets;
     using UnityEngine.Scripting.APIUpdating;
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.BuildCommands.Editor.Addressables")]
+    [BuildCommandMetadata(
+        displayName: "Apply Addressables Settings",
+        description: "Applies global Addressables configuration settings including build paths, player version, update check behavior, and content delivery network parameters.",
+        category: "Addressables"
+    )]
     public class ApplyAddressablesSettingsCommand : SerializableBuildCommand
     {
 

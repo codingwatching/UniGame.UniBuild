@@ -5,12 +5,18 @@ namespace UniGame.BuildCommands.Editor
     using System;
     using global::UniGame.Utils;
     using global::UniGame.UniBuild.Editor;
+    using UniBuild.Editor.Inspector;
     using UnityEngine;
     using UnityEngine.Networking;
     using UnityEngine.Scripting.APIUpdating;
 
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.BuildCommands.Editor.WebRequests")]
+    [BuildCommandMetadata(
+        displayName: "Web Request POST",
+        description: "Sends an HTTP POST request to a specified API endpoint with customizable headers, parameters, and body content. Useful for notifying external services, uploading build data, or triggering remote processes.",
+        category: "Distribution"
+    )]
     public class WebRequestPostCommand : SerializableBuildCommand
     {
         public string apiUrl = "";

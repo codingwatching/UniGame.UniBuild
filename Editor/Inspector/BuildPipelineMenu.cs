@@ -9,7 +9,7 @@ namespace UniGame.UniBuild.Editor.Inspector
     /// </summary>
     public static class BuildPipelineMenu
     {
-        [MenuItem("UniGame/Build Pipeline/Pipeline Editor", priority = 100)]
+        [MenuItem("UniGame/Build Pipeline/Pipeline Editor", priority = 0)]
         public static void OpenPipelineEditor()
         {
             BuildPipelineEditorWindow.ShowWindow();
