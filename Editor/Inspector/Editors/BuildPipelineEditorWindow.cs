@@ -234,6 +234,10 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _executePipelineButton.AddToClassList("button-execute");
             editorHeader.Add(_executePipelineButton);
 
+            var pingButton = new Button(PingSelectedPipeline) { text = "Ping" };
+            pingButton.style.width = 60;
+            editorHeader.Add(pingButton);
+
             panel.Add(editorHeader);
 
             // Step search
@@ -548,35 +552,33 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
 
         private VisualElement CreatePipelineStepItem(BuildCommandStep step)
         {
-            var item = new VisualElement();
-            item.AddToClassList("pipeline-step-item");
-            item.style.flexDirection = FlexDirection.Row;
-            item.style.paddingLeft = 8;
-            item.style.paddingRight = 8;
-            item.style.paddingTop = 8;
-            item.style.paddingBottom = 8;
-            item.style.marginBottom = 4;
-            item.style.borderTopWidth = 1;
-            item.style.borderRightWidth = 1;
-            item.style.borderBottomWidth = 1;
-            item.style.borderLeftWidth = 1;
-            
-            var borderColor = new Color(0.3f, 0.3f, 0.3f);
-            item.style.borderTopColor = new StyleColor(borderColor);
-            item.style.borderRightColor = new StyleColor(borderColor);
-            item.style.borderBottomColor = new StyleColor(borderColor);
-            item.style.borderLeftColor = new StyleColor(borderColor);
+            var container = new VisualElement();
+            container.style.flexDirection = FlexDirection.Column;
+            container.style.marginBottom = 8;
 
             // Get the first command from the step for display
             var commands = step.GetCommands().ToList();
             if (commands.Count == 0)
-                return item;
+                return container;
 
             var command = commands[0];
+
+            // Header row with toggle, name, and buttons
+            var headerRow = new VisualElement();
+            headerRow.style.flexDirection = FlexDirection.Row;
+            headerRow.style.alignItems = Align.Center;
+            headerRow.style.paddingLeft = 8;
+            headerRow.style.paddingRight = 8;
+            headerRow.style.paddingTop = 8;
+            headerRow.style.paddingBottom = 8;
+            headerRow.style.backgroundColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
+            headerRow.style.borderBottomWidth = 1;
+            headerRow.style.borderBottomColor = new StyleColor(new Color(0.15f, 0.15f, 0.15f));
 
             // Active toggle
             var activeToggle = new Toggle();
             activeToggle.value = command.IsActive;
+            activeToggle.style.marginRight = 4;
             activeToggle.RegisterValueChangedCallback(evt =>
             {
                 var field = command.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
@@ -586,25 +588,159 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                     EditorUtility.SetDirty(_selectedPipeline);
                 }
             });
-            item.Add(activeToggle);
+            headerRow.Add(activeToggle);
 
-            // Command name
+            // Command name and type
+            var nameContainer = new VisualElement();
+            nameContainer.style.flexDirection = FlexDirection.Column;
+            nameContainer.style.flexGrow = 1;
+
             var nameLabel = new Label(command.Name);
-            nameLabel.style.flexGrow = 1;
-            item.Add(nameLabel);
+            nameLabel.style.fontSize = 12;
+            nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            nameContainer.Add(nameLabel);
+
+            var typeLabel = new Label(command.GetType().Name);
+            typeLabel.style.fontSize = 10;
+            typeLabel.style.color = new StyleColor(new Color(0.7f, 0.7f, 0.7f));
+            nameContainer.Add(typeLabel);
+
+            headerRow.Add(nameContainer);
 
             // Execute button
             var executeButton = new Button(() => ExecuteStep(command)) { text = "Run" };
             executeButton.style.width = 50;
-            item.Add(executeButton);
+            executeButton.style.marginRight = 4;
+            headerRow.Add(executeButton);
 
             // Delete button
             var deleteButton = new Button(() => RemoveStep(step)) { text = "Remove" };
             deleteButton.style.width = 70;
             deleteButton.AddToClassList("button-danger");
-            item.Add(deleteButton);
+            headerRow.Add(deleteButton);
 
-            return item;
+            container.Add(headerRow);
+
+            // Command inspector/properties
+            var inspectorContainer = new VisualElement();
+            inspectorContainer.style.paddingLeft = 16;
+            inspectorContainer.style.paddingRight = 8;
+            inspectorContainer.style.paddingTop = 8;
+            inspectorContainer.style.paddingBottom = 8;
+            inspectorContainer.style.flexDirection = FlexDirection.Column;
+
+            // Display command properties
+            DisplayCommandProperties(command, inspectorContainer);
+
+            container.Add(inspectorContainer);
+
+            // Check if this is a PipelineCommandsGroup and display nested commands
+            if (command is PipelineCommandsGroup group)
+            {
+                var nestedContainer = new VisualElement();
+                nestedContainer.style.flexDirection = FlexDirection.Column;
+                nestedContainer.style.paddingLeft = 16;
+                nestedContainer.style.marginTop = 4;
+                nestedContainer.style.borderLeftWidth = 2;
+                nestedContainer.style.borderLeftColor = new StyleColor(new Color(0.5f, 0.5f, 0.5f));
+
+                var nestedLabel = new Label("Nested Commands:");
+                nestedLabel.style.fontSize = 11;
+                nestedLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                nestedLabel.style.marginBottom = 4;
+                nestedContainer.Add(nestedLabel);
+
+                var nestedCommandsList = group.commands.Commands.ToList();
+                foreach (var nestedCommand in nestedCommandsList)
+                {
+                    if (nestedCommand == null) continue;
+
+                    var nestedRow = new VisualElement();
+                    nestedRow.style.flexDirection = FlexDirection.Row;
+                    nestedRow.style.alignItems = Align.Center;
+                    nestedRow.style.marginBottom = 4;
+                    nestedRow.style.paddingLeft = 4;
+                    nestedRow.style.paddingRight = 4;
+                    nestedRow.style.paddingTop = 2;
+                    nestedRow.style.paddingBottom = 2;
+
+                    var nestedToggle = new Toggle();
+                    nestedToggle.value = nestedCommand.IsActive;
+                    nestedToggle.style.marginRight = 4;
+                    nestedToggle.RegisterValueChangedCallback(evt =>
+                    {
+                        var field = nestedCommand.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
+                        if (field != null)
+                        {
+                            field.SetValue(nestedCommand, evt.newValue);
+                            EditorUtility.SetDirty(_selectedPipeline);
+                        }
+                    });
+                    nestedRow.Add(nestedToggle);
+
+                    var nestedNameContainer = new VisualElement();
+                    nestedNameContainer.style.flexDirection = FlexDirection.Column;
+                    nestedNameContainer.style.flexGrow = 1;
+
+                    var nestedLabel2 = new Label(nestedCommand.Name);
+                    nestedLabel2.style.fontSize = 10;
+                    nestedNameContainer.Add(nestedLabel2);
+
+                    var nestedTypeLabel = new Label(nestedCommand.GetType().Name);
+                    nestedTypeLabel.style.fontSize = 9;
+                    nestedTypeLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                    nestedNameContainer.Add(nestedTypeLabel);
+
+                    nestedRow.Add(nestedNameContainer);
+
+                    var nestedExecuteButton = new Button(() => ExecuteStep(nestedCommand)) { text = "Run" };
+                    nestedExecuteButton.style.width = 40;
+                    nestedExecuteButton.style.fontSize = 10;
+                    nestedExecuteButton.style.marginRight = 2;
+                    nestedRow.Add(nestedExecuteButton);
+
+                    nestedContainer.Add(nestedRow);
+                }
+
+                if (nestedCommandsList.Count > 0)
+                    container.Add(nestedContainer);
+            }
+
+            return container;
+        }
+
+        private void DisplayCommandProperties(IUnityBuildCommand command, VisualElement container)
+        {
+            var commandObject = command as UnityEngine.Object;
+            if (commandObject == null)
+                return;
+
+            // Get all serialized properties
+            var so = new SerializedObject(commandObject);
+            var prop = so.GetIterator();
+
+            bool enterChildren = true;
+            while (prop.NextVisible(enterChildren))
+            {
+                enterChildren = false;
+
+                // Skip internal properties
+                if (prop.name == "m_Script" || prop.name == "isActive")
+                    continue;
+
+                var field = new PropertyField(prop);
+                field.style.marginBottom = 4;
+                container.Add(field);
+            }
+
+            // If no properties found, show a message
+            if (container.childCount == 0)
+            {
+                var emptyLabel = new Label("No properties to display");
+                emptyLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                emptyLabel.style.fontSize = 10;
+                container.Add(emptyLabel);
+            }
         }
 
         private void ExecuteStep(IUnityBuildCommand command)
@@ -634,6 +770,18 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             EditorUtility.SetDirty(_selectedPipeline);
             RefreshPipelineEditor();
             UpdateStatusLabel("Step removed");
+        }
+
+        private void PingSelectedPipeline()
+        {
+            if (_selectedPipeline == null)
+            {
+                UpdateStatusLabel("No pipeline selected");
+                return;
+            }
+
+            EditorGUIUtility.PingObject(_selectedPipeline);
+            UpdateStatusLabel($"Pinged: {_selectedPipeline.name}");
         }
 
         private void ExecuteSelectedPipeline()
