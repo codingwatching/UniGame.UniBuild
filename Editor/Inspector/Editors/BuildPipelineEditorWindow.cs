@@ -595,7 +595,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             stepFoldout.style.paddingLeft = 0;
             stepFoldout.style.marginBottom = 0;
 
-            // Step header with delete button (always visible)
+            // Step header with Run and Remove buttons on the same line
             var stepHeaderRow = new VisualElement();
             stepHeaderRow.style.flexDirection = FlexDirection.Row;
             stepHeaderRow.style.alignItems = Align.Center;
@@ -604,19 +604,30 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             stepHeaderRow.style.paddingRight = 8;
             stepHeaderRow.style.paddingTop = 4;
             stepHeaderRow.style.paddingBottom = 4;
+            stepHeaderRow.style.marginBottom = 0;
 
+            // Run button for the step
+            var runStepButton = new Button(() => ExecuteStep(step.GetCommands().FirstOrDefault())) { text = "Run" };
+            runStepButton.style.width = 50;
+            runStepButton.style.marginRight = 4;
+            stepHeaderRow.Add(runStepButton);
+
+            // Remove button for the step
             var deleteButton = new Button(() => RemoveStep(step)) { text = "Remove Step" };
             deleteButton.style.width = 100;
             deleteButton.AddToClassList("button-danger");
             stepHeaderRow.Add(deleteButton);
 
-            // Add header to foldout's toggle area by inserting before content
+            // Add header to foldout's toggle area
             stepFoldout.Add(stepHeaderRow);
 
             // Create content container for all commands
             var contentContainer = new VisualElement();
             contentContainer.style.flexDirection = FlexDirection.Column;
             contentContainer.style.paddingLeft = 12;
+
+            // Check if step has only one regular command (not a group)
+            bool isSingleRegularCommand = commands.Count == 1 && !(commands[0] is PipelineCommandsGroup);
 
             // Display each command with its own inspector
             if (commands.Count == 0)
@@ -627,6 +638,52 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 emptyLabel.style.marginLeft = 16;
                 emptyLabel.style.marginTop = 8;
                 contentContainer.Add(emptyLabel);
+            }
+            else if (isSingleRegularCommand)
+            {
+                // For single regular command, display properties directly without wrapper
+                var command = commands[0];
+                
+                // Command properties directly in content (no wrapper, no duplicate buttons)
+                var inspectorContainer = new VisualElement();
+                inspectorContainer.style.flexDirection = FlexDirection.Column;
+                inspectorContainer.style.paddingLeft = 4;
+                inspectorContainer.style.paddingTop = 4;
+                inspectorContainer.style.paddingRight = 4;
+                inspectorContainer.style.marginLeft = 0;
+                inspectorContainer.style.marginRight = 0;
+                
+                // Add toggle and type info as header
+                var commandHeaderRow = new VisualElement();
+                commandHeaderRow.style.flexDirection = FlexDirection.Row;
+                commandHeaderRow.style.alignItems = Align.Center;
+                commandHeaderRow.style.marginBottom = 8;
+                commandHeaderRow.style.paddingLeft = 4;
+                commandHeaderRow.style.paddingRight = 4;
+                
+                var toggle = new Toggle();
+                toggle.value = command.IsActive;
+                toggle.style.marginRight = 6;
+                toggle.RegisterValueChangedCallback(evt =>
+                {
+                    var field = command.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
+                    if (field != null)
+                    {
+                        field.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    }
+                });
+                commandHeaderRow.Add(toggle);
+                
+                var typeLabel = new Label(command.GetType().Name);
+                typeLabel.style.fontSize = 9;
+                typeLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                commandHeaderRow.Add(typeLabel);
+                
+                inspectorContainer.Add(commandHeaderRow);
+                DisplayCommandProperties(command, inspectorContainer);
+                
+                contentContainer.Add(inspectorContainer);
             }
             else
             {
@@ -761,22 +818,24 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                     }
                     else
                     {
-                        // For regular commands, create wrapper container (column layout)
+                        // For multiple regular commands, create wrapper container (column layout) with no extra indentation
                         var commandWrapper = new VisualElement();
                         commandWrapper.style.flexDirection = FlexDirection.Column;
-                        commandWrapper.style.marginLeft = 8;
-                        commandWrapper.style.marginRight = 8;
-                        commandWrapper.style.marginTop = 8;
-                        commandWrapper.style.marginBottom = 8;
+                        commandWrapper.style.marginLeft = 0;
+                        commandWrapper.style.marginRight = 0;
+                        commandWrapper.style.marginTop = 4;
+                        commandWrapper.style.marginBottom = 4;
 
-                        // Header line: toggle, type, name label, buttons
+                        // Header line: toggle, type, buttons (no name label - already in foldout header)
                         var commandHeaderRow = new VisualElement();
                         commandHeaderRow.style.flexDirection = FlexDirection.Row;
                         commandHeaderRow.style.alignItems = Align.Center;
                         commandHeaderRow.style.justifyContent = Justify.SpaceBetween;
-                        commandHeaderRow.style.marginBottom = 4;
+                        commandHeaderRow.style.marginBottom = 0;
+                        commandHeaderRow.style.paddingLeft = 4;
+                        commandHeaderRow.style.paddingRight = 4;
 
-                        // Left section: toggle, type label, command name
+                        // Left section: toggle, type label
                         var leftSection = new VisualElement();
                         leftSection.style.flexDirection = FlexDirection.Row;
                         leftSection.style.alignItems = Align.Center;
@@ -802,12 +861,6 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                         typeLabel.style.marginRight = 8;
                         leftSection.Add(typeLabel);
 
-                        var nameLabel = new Label(command.Name);
-                        nameLabel.style.fontSize = 11;
-                        nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-                        nameLabel.style.flexGrow = 1;
-                        leftSection.Add(nameLabel);
-
                         // Right section: buttons
                         var rightSection = new VisualElement();
                         rightSection.style.flexDirection = FlexDirection.Row;
@@ -828,12 +881,14 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
 
                         commandWrapper.Add(commandHeaderRow);
 
-                        // Command properties below header (no foldout, always visible)
+                        // Command properties below header (no extra indentation)
                         var inspectorContainer = new VisualElement();
                         inspectorContainer.style.flexDirection = FlexDirection.Column;
-                        inspectorContainer.style.paddingLeft = 12;
-                        inspectorContainer.style.paddingTop = 4;
+                        inspectorContainer.style.paddingLeft = 4;
+                        inspectorContainer.style.paddingTop = 0;
                         inspectorContainer.style.paddingRight = 4;
+                        inspectorContainer.style.marginLeft = 0;
+                        inspectorContainer.style.marginRight = 0;
                         DisplayCommandProperties(command, inspectorContainer);
                         
                         if (inspectorContainer.childCount > 0)
