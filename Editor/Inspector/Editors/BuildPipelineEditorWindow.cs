@@ -57,6 +57,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         private UniBuildPipeline _selectedPipeline;
         private Dictionary<Type, BuildCommandMetadataAttribute> _commandMetadata;
         private List<PipelineExecutionState> _executionHistory = new List<PipelineExecutionState>();
+        private string _stepSearchFilter = ""; // Current step search filter
         
         // Drag-Drop manager
         private DragDropManager _dragDropManager;
@@ -566,6 +567,13 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 int stepIndex = 0;
                 foreach (var command in _selectedPipeline.preBuildCommands)
                 {
+                    // Apply search filter
+                    if (!string.IsNullOrEmpty(_stepSearchFilter) && !StepMatchesFilter(command, _stepSearchFilter))
+                    {
+                        stepIndex++;
+                        continue;
+                    }
+                    
                     var stepItem = CreatePipelineStepItem(command, stepIndex, _selectedPipeline.preBuildCommands, true);
                     _pipelineEditorContainer.Add(stepItem);
                     stepIndex++;
@@ -589,6 +597,13 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 int stepIndex = _selectedPipeline.preBuildCommands.Count;
                 foreach (var command in _selectedPipeline.postBuildCommands)
                 {
+                    // Apply search filter
+                    if (!string.IsNullOrEmpty(_stepSearchFilter) && !StepMatchesFilter(command, _stepSearchFilter))
+                    {
+                        stepIndex++;
+                        continue;
+                    }
+                    
                     var stepItem = CreatePipelineStepItem(command, stepIndex, _selectedPipeline.postBuildCommands, false);
                     _pipelineEditorContainer.Add(stepItem);
                     stepIndex++;
@@ -1987,8 +2002,44 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         private void FilterPipelineSteps(string filter)
         {
             if (_selectedPipeline == null) return;
+            _stepSearchFilter = filter;
             RefreshPipelineEditor();
-            // Could further filter the displayed steps
+        }
+
+        /// <summary>
+        /// Check if a build command step matches the search filter
+        /// Searches in:
+        /// - Step name (command type name)
+        /// - Nested command names (for PipelineCommandsGroup)
+        /// </summary>
+        private bool StepMatchesFilter(BuildCommandStep step, string filter)
+        {
+            var filterLower = filter.ToLower();
+            
+            // Get the actual command - could be Unity or Serializable
+            var command = step.buildCommand ?? step.serializableCommand;
+            if (command == null) return false;
+            
+            // Check step type name
+            var stepTypeName = command.GetType().Name;
+            if (stepTypeName.Contains(filterLower, System.StringComparison.OrdinalIgnoreCase))
+                return true;
+            
+            // Check if it's a PipelineCommandsGroup and search nested commands
+            var commandsGroup = command as PipelineCommandsGroup;
+            if (commandsGroup != null && commandsGroup.commands != null)
+            {
+                foreach (var nestedStep in commandsGroup.commands.commands)
+                {
+                    var nestedCommand = nestedStep.buildCommand ?? nestedStep.serializableCommand;
+                    if (nestedCommand == null) continue;
+                    var nestedCommandName = nestedCommand.GetType().Name;
+                    if (nestedCommandName.Contains(filterLower, System.StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+            
+            return false;
         }
 
         private void FilterCommandCatalog(string filter)
