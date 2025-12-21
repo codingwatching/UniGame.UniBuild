@@ -66,7 +66,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
 
         private void OnEnable()
         {
-            _settings = BuildPipelineSettingsManager.GetSettings();
+            _settings = BuildPipelineInspectorSettings.GetSettings();
             CollectCommandMetadata();
         }
 
@@ -554,191 +554,496 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         {
             var container = new VisualElement();
             container.style.flexDirection = FlexDirection.Column;
-            container.style.marginBottom = 8;
+            container.style.marginBottom = 12;
+            container.style.borderBottomWidth = 1;
+            container.style.borderBottomColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f));
+            container.style.paddingBottom = 12;
 
-            // Get the first command from the step for display
+            // Get all commands from the step
             var commands = step.GetCommands().ToList();
+
+            // Determine step title based on command
+            string stepTitle;
             if (commands.Count == 0)
-                return container;
-
-            var command = commands[0];
-
-            // Header row with toggle, name, and buttons
-            var headerRow = new VisualElement();
-            headerRow.style.flexDirection = FlexDirection.Row;
-            headerRow.style.alignItems = Align.Center;
-            headerRow.style.paddingLeft = 8;
-            headerRow.style.paddingRight = 8;
-            headerRow.style.paddingTop = 8;
-            headerRow.style.paddingBottom = 8;
-            headerRow.style.backgroundColor = new StyleColor(new Color(0.25f, 0.25f, 0.25f));
-            headerRow.style.borderBottomWidth = 1;
-            headerRow.style.borderBottomColor = new StyleColor(new Color(0.15f, 0.15f, 0.15f));
-
-            // Active toggle
-            var activeToggle = new Toggle();
-            activeToggle.value = command.IsActive;
-            activeToggle.style.marginRight = 4;
-            activeToggle.RegisterValueChangedCallback(evt =>
             {
-                var field = command.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
-                if (field != null)
-                {
-                    field.SetValue(command, evt.newValue);
-                    EditorUtility.SetDirty(_selectedPipeline);
-                }
-            });
-            headerRow.Add(activeToggle);
-
-            // Command name and type
-            var nameContainer = new VisualElement();
-            nameContainer.style.flexDirection = FlexDirection.Column;
-            nameContainer.style.flexGrow = 1;
-
-            var nameLabel = new Label(command.Name);
-            nameLabel.style.fontSize = 12;
-            nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            nameContainer.Add(nameLabel);
-
-            var typeLabel = new Label(command.GetType().Name);
-            typeLabel.style.fontSize = 10;
-            typeLabel.style.color = new StyleColor(new Color(0.7f, 0.7f, 0.7f));
-            nameContainer.Add(typeLabel);
-
-            headerRow.Add(nameContainer);
-
-            // Execute button
-            var executeButton = new Button(() => ExecuteStep(command)) { text = "Run" };
-            executeButton.style.width = 50;
-            executeButton.style.marginRight = 4;
-            headerRow.Add(executeButton);
-
-            // Delete button
-            var deleteButton = new Button(() => RemoveStep(step)) { text = "Remove" };
-            deleteButton.style.width = 70;
-            deleteButton.AddToClassList("button-danger");
-            headerRow.Add(deleteButton);
-
-            container.Add(headerRow);
-
-            // Command inspector/properties
-            var inspectorContainer = new VisualElement();
-            inspectorContainer.style.paddingLeft = 16;
-            inspectorContainer.style.paddingRight = 8;
-            inspectorContainer.style.paddingTop = 8;
-            inspectorContainer.style.paddingBottom = 8;
-            inspectorContainer.style.flexDirection = FlexDirection.Column;
-
-            // Display command properties
-            DisplayCommandProperties(command, inspectorContainer);
-
-            container.Add(inspectorContainer);
-
-            // Check if this is a PipelineCommandsGroup and display nested commands
-            if (command is PipelineCommandsGroup group)
+                stepTitle = "Step (no commands)";
+            }
+            else
             {
-                var nestedContainer = new VisualElement();
-                nestedContainer.style.flexDirection = FlexDirection.Column;
-                nestedContainer.style.paddingLeft = 16;
-                nestedContainer.style.marginTop = 4;
-                nestedContainer.style.borderLeftWidth = 2;
-                nestedContainer.style.borderLeftColor = new StyleColor(new Color(0.5f, 0.5f, 0.5f));
-
-                var nestedLabel = new Label("Nested Commands:");
-                nestedLabel.style.fontSize = 11;
-                nestedLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-                nestedLabel.style.marginBottom = 4;
-                nestedContainer.Add(nestedLabel);
-
-                var nestedCommandsList = group.commands.Commands.ToList();
-                foreach (var nestedCommand in nestedCommandsList)
+                var firstCommand = commands[0];
+                if (firstCommand is PipelineCommandsGroup group)
                 {
-                    if (nestedCommand == null) continue;
-
-                    var nestedRow = new VisualElement();
-                    nestedRow.style.flexDirection = FlexDirection.Row;
-                    nestedRow.style.alignItems = Align.Center;
-                    nestedRow.style.marginBottom = 4;
-                    nestedRow.style.paddingLeft = 4;
-                    nestedRow.style.paddingRight = 4;
-                    nestedRow.style.paddingTop = 2;
-                    nestedRow.style.paddingBottom = 2;
-
-                    var nestedToggle = new Toggle();
-                    nestedToggle.value = nestedCommand.IsActive;
-                    nestedToggle.style.marginRight = 4;
-                    nestedToggle.RegisterValueChangedCallback(evt =>
-                    {
-                        var field = nestedCommand.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
-                        if (field != null)
-                        {
-                            field.SetValue(nestedCommand, evt.newValue);
-                            EditorUtility.SetDirty(_selectedPipeline);
-                        }
-                    });
-                    nestedRow.Add(nestedToggle);
-
-                    var nestedNameContainer = new VisualElement();
-                    nestedNameContainer.style.flexDirection = FlexDirection.Column;
-                    nestedNameContainer.style.flexGrow = 1;
-
-                    var nestedLabel2 = new Label(nestedCommand.Name);
-                    nestedLabel2.style.fontSize = 10;
-                    nestedNameContainer.Add(nestedLabel2);
-
-                    var nestedTypeLabel = new Label(nestedCommand.GetType().Name);
-                    nestedTypeLabel.style.fontSize = 9;
-                    nestedTypeLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
-                    nestedNameContainer.Add(nestedTypeLabel);
-
-                    nestedRow.Add(nestedNameContainer);
-
-                    var nestedExecuteButton = new Button(() => ExecuteStep(nestedCommand)) { text = "Run" };
-                    nestedExecuteButton.style.width = 40;
-                    nestedExecuteButton.style.fontSize = 10;
-                    nestedExecuteButton.style.marginRight = 2;
-                    nestedRow.Add(nestedExecuteButton);
-
-                    nestedContainer.Add(nestedRow);
+                    // For groups, show the group name + nested command count
+                    var nestedCount = group.commands.Commands.Count();
+                    stepTitle = $"{firstCommand.Name} ({nestedCount} command{(nestedCount != 1 ? "s" : "")})";
                 }
-
-                if (nestedCommandsList.Count > 0)
-                    container.Add(nestedContainer);
+                else
+                {
+                    // For regular commands, show the command name
+                    stepTitle = firstCommand.Name;
+                }
             }
 
+            // Create foldout for the entire step
+            var stepFoldout = new Foldout
+            {
+                text = stepTitle,
+                value = true
+            };
+            stepFoldout.style.fontSize = 12;
+            stepFoldout.style.unityFontStyleAndWeight = FontStyle.Bold;
+            stepFoldout.style.paddingLeft = 0;
+            stepFoldout.style.marginBottom = 0;
+
+            // Step header with delete button (always visible)
+            var stepHeaderRow = new VisualElement();
+            stepHeaderRow.style.flexDirection = FlexDirection.Row;
+            stepHeaderRow.style.alignItems = Align.Center;
+            stepHeaderRow.style.justifyContent = Justify.FlexEnd;
+            stepHeaderRow.style.paddingLeft = 8;
+            stepHeaderRow.style.paddingRight = 8;
+            stepHeaderRow.style.paddingTop = 4;
+            stepHeaderRow.style.paddingBottom = 4;
+
+            var deleteButton = new Button(() => RemoveStep(step)) { text = "Remove Step" };
+            deleteButton.style.width = 100;
+            deleteButton.AddToClassList("button-danger");
+            stepHeaderRow.Add(deleteButton);
+
+            // Add header to foldout's toggle area by inserting before content
+            stepFoldout.Add(stepHeaderRow);
+
+            // Create content container for all commands
+            var contentContainer = new VisualElement();
+            contentContainer.style.flexDirection = FlexDirection.Column;
+            contentContainer.style.paddingLeft = 12;
+
+            // Display each command with its own inspector
+            if (commands.Count == 0)
+            {
+                var emptyLabel = new Label("No commands in this step");
+                emptyLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                emptyLabel.style.fontSize = 10;
+                emptyLabel.style.marginLeft = 16;
+                emptyLabel.style.marginTop = 8;
+                contentContainer.Add(emptyLabel);
+            }
+            else
+            {
+                // Display each command
+                for (int i = 0; i < commands.Count; i++)
+                {
+                    var command = commands[i];
+                    if (command == null) continue;
+
+                    // Check if this is a PipelineCommandsGroup
+                    if (command is PipelineCommandsGroup group)
+                    {
+                        // For group commands, show each nested command as separate item
+                        var nestedCommandsList = group.commands.Commands.ToList();
+                        
+                        var groupHeaderContainer = new VisualElement();
+                        groupHeaderContainer.style.flexDirection = FlexDirection.Column;
+                        groupHeaderContainer.style.marginLeft = 8;
+                        groupHeaderContainer.style.marginRight = 8;
+                        groupHeaderContainer.style.marginTop = 8;
+                        groupHeaderContainer.style.marginBottom = 8;
+
+                        // Group header
+                        var groupHeaderRow = new VisualElement();
+                        groupHeaderRow.style.flexDirection = FlexDirection.Row;
+                        groupHeaderRow.style.alignItems = Align.Center;
+                        groupHeaderRow.style.justifyContent = Justify.SpaceBetween;
+                        groupHeaderRow.style.marginBottom = 6;
+                        groupHeaderRow.style.paddingBottom = 4;
+                        groupHeaderRow.style.borderBottomWidth = 1;
+                        groupHeaderRow.style.borderBottomColor = new StyleColor(new Color(0.35f, 0.35f, 0.35f));
+
+                        var groupLabel = new Label($"Command Group: {command.Name}");
+                        groupLabel.style.fontSize = 11;
+                        groupLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                        groupLabel.style.color = new StyleColor(new Color(0.8f, 0.8f, 0.8f));
+                        groupHeaderRow.Add(groupLabel);
+
+                        var groupRunBtn = new Button(() => ExecuteStep(command)) { text = "Run All" };
+                        groupRunBtn.style.width = 70;
+                        groupHeaderRow.Add(groupRunBtn);
+
+                        groupHeaderContainer.Add(groupHeaderRow);
+
+                        // Display each nested command as separate line
+                        if (nestedCommandsList.Count > 0)
+                        {
+                            var nestedItemsContainer = new VisualElement();
+                            nestedItemsContainer.style.flexDirection = FlexDirection.Column;
+                            nestedItemsContainer.style.marginLeft = 12;
+                            nestedItemsContainer.style.borderLeftWidth = 2;
+                            nestedItemsContainer.style.borderLeftColor = new StyleColor(new Color(0.4f, 0.6f, 0.8f));
+                            nestedItemsContainer.style.paddingLeft = 8;
+
+                            foreach (var nestedCmd in nestedCommandsList)
+                            {
+                                if (nestedCmd == null) continue;
+
+                                var nestedItemContainer = new VisualElement();
+                                nestedItemContainer.style.flexDirection = FlexDirection.Column;
+                                nestedItemContainer.style.marginBottom = 8;
+                                nestedItemContainer.style.paddingBottom = 8;
+                                nestedItemContainer.style.borderBottomWidth = 1;
+                                nestedItemContainer.style.borderBottomColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f));
+
+                                // Nested command header line
+                                var nestedHeaderRow = new VisualElement();
+                                nestedHeaderRow.style.flexDirection = FlexDirection.Row;
+                                nestedHeaderRow.style.alignItems = Align.Center;
+                                nestedHeaderRow.style.justifyContent = Justify.SpaceBetween;
+                                nestedHeaderRow.style.marginBottom = 6;
+
+                                var nestedToggle = new Toggle();
+                                nestedToggle.value = nestedCmd.IsActive;
+                                nestedToggle.style.marginRight = 6;
+                                nestedToggle.RegisterValueChangedCallback(evt =>
+                                {
+                                    var field = nestedCmd.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
+                                    if (field != null)
+                                    {
+                                        field.SetValue(nestedCmd, evt.newValue);
+                                        EditorUtility.SetDirty(_selectedPipeline);
+                                    }
+                                });
+                                nestedHeaderRow.Add(nestedToggle);
+
+                                var nestedNameLabel = new Label(nestedCmd.Name);
+                                nestedNameLabel.style.fontSize = 10;
+                                nestedNameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                                nestedNameLabel.style.flexGrow = 1;
+                                nestedHeaderRow.Add(nestedNameLabel);
+
+                                var nestedTypeLabel = new Label(nestedCmd.GetType().Name);
+                                nestedTypeLabel.style.fontSize = 8;
+                                nestedTypeLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                                nestedTypeLabel.style.marginRight = 8;
+                                nestedHeaderRow.Add(nestedTypeLabel);
+
+                                var nestedExecuteBtn = new Button(() => ExecuteStep(nestedCmd)) { text = "Run" };
+                                nestedExecuteBtn.style.width = 45;
+                                nestedExecuteBtn.style.fontSize = 9;
+                                nestedHeaderRow.Add(nestedExecuteBtn);
+
+                                nestedItemContainer.Add(nestedHeaderRow);
+
+                                // Nested command properties inline (no foldout)
+                                var nestedPropsContainer = new VisualElement();
+                                nestedPropsContainer.style.flexDirection = FlexDirection.Column;
+                                nestedPropsContainer.style.marginLeft = 4;
+                                nestedPropsContainer.style.paddingLeft = 4;
+                                nestedPropsContainer.style.paddingRight = 4;
+                                DisplayCommandProperties(nestedCmd, nestedPropsContainer);
+                                
+                                if (nestedPropsContainer.childCount > 0)
+                                    nestedItemContainer.Add(nestedPropsContainer);
+
+                                nestedItemsContainer.Add(nestedItemContainer);
+                            }
+
+                            groupHeaderContainer.Add(nestedItemsContainer);
+                        }
+                        else
+                        {
+                            var emptyLabel = new Label("No nested commands");
+                            emptyLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                            emptyLabel.style.fontSize = 9;
+                            emptyLabel.style.marginLeft = 12;
+                            groupHeaderContainer.Add(emptyLabel);
+                        }
+
+                        contentContainer.Add(groupHeaderContainer);
+                    }
+                    else
+                    {
+                        // For regular commands, create wrapper container (column layout)
+                        var commandWrapper = new VisualElement();
+                        commandWrapper.style.flexDirection = FlexDirection.Column;
+                        commandWrapper.style.marginLeft = 8;
+                        commandWrapper.style.marginRight = 8;
+                        commandWrapper.style.marginTop = 8;
+                        commandWrapper.style.marginBottom = 8;
+
+                        // Header line: toggle, type, name label, buttons
+                        var commandHeaderRow = new VisualElement();
+                        commandHeaderRow.style.flexDirection = FlexDirection.Row;
+                        commandHeaderRow.style.alignItems = Align.Center;
+                        commandHeaderRow.style.justifyContent = Justify.SpaceBetween;
+                        commandHeaderRow.style.marginBottom = 4;
+
+                        // Left section: toggle, type label, command name
+                        var leftSection = new VisualElement();
+                        leftSection.style.flexDirection = FlexDirection.Row;
+                        leftSection.style.alignItems = Align.Center;
+                        leftSection.style.flexGrow = 1;
+
+                        var toggle = new Toggle();
+                        toggle.value = command.IsActive;
+                        toggle.style.marginRight = 6;
+                        toggle.RegisterValueChangedCallback(evt =>
+                        {
+                            var field = command.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
+                            if (field != null)
+                            {
+                                field.SetValue(command, evt.newValue);
+                                EditorUtility.SetDirty(_selectedPipeline);
+                            }
+                        });
+                        leftSection.Add(toggle);
+
+                        var typeLabel = new Label(command.GetType().Name);
+                        typeLabel.style.fontSize = 9;
+                        typeLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                        typeLabel.style.marginRight = 8;
+                        leftSection.Add(typeLabel);
+
+                        var nameLabel = new Label(command.Name);
+                        nameLabel.style.fontSize = 11;
+                        nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                        nameLabel.style.flexGrow = 1;
+                        leftSection.Add(nameLabel);
+
+                        // Right section: buttons
+                        var rightSection = new VisualElement();
+                        rightSection.style.flexDirection = FlexDirection.Row;
+                        rightSection.style.alignItems = Align.Center;
+
+                        var executeBtn = new Button(() => ExecuteStep(command)) { text = "Run" };
+                        executeBtn.style.width = 50;
+                        executeBtn.style.marginRight = 4;
+                        rightSection.Add(executeBtn);
+
+                        var removeBtn = new Button(() => RemoveStep(step)) { text = "Remove" };
+                        removeBtn.style.width = 70;
+                        removeBtn.AddToClassList("button-danger");
+                        rightSection.Add(removeBtn);
+
+                        commandHeaderRow.Add(leftSection);
+                        commandHeaderRow.Add(rightSection);
+
+                        commandWrapper.Add(commandHeaderRow);
+
+                        // Command properties below header (no foldout, always visible)
+                        var inspectorContainer = new VisualElement();
+                        inspectorContainer.style.flexDirection = FlexDirection.Column;
+                        inspectorContainer.style.paddingLeft = 12;
+                        inspectorContainer.style.paddingTop = 4;
+                        inspectorContainer.style.paddingRight = 4;
+                        DisplayCommandProperties(command, inspectorContainer);
+                        
+                        if (inspectorContainer.childCount > 0)
+                        {
+                            commandWrapper.Add(inspectorContainer);
+                        }
+
+                        contentContainer.Add(commandWrapper);
+                    }
+                }
+            }
+
+            stepFoldout.Add(contentContainer);
+            container.Add(stepFoldout);
             return container;
         }
 
         private void DisplayCommandProperties(IUnityBuildCommand command, VisualElement container)
         {
-            var commandObject = command as UnityEngine.Object;
-            if (commandObject == null)
+            if (command == null)
                 return;
 
-            // Get all serialized properties
-            var so = new SerializedObject(commandObject);
-            var prop = so.GetIterator();
+            var commandType = command.GetType();
+            var fields = commandType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-            bool enterChildren = true;
-            while (prop.NextVisible(enterChildren))
+            int propertyCount = 0;
+
+            foreach (var fieldInfo in fields)
             {
-                enterChildren = false;
-
-                // Skip internal properties
-                if (prop.name == "m_Script" || prop.name == "isActive")
+                // Skip backing fields and internal Unity fields
+                if (fieldInfo.Name.StartsWith("<") || fieldInfo.Name.StartsWith("m_"))
                     continue;
 
-                var field = new PropertyField(prop);
-                field.style.marginBottom = 4;
-                container.Add(field);
+                // Skip isActive as it's handled by toggle
+                if (fieldInfo.Name == "isActive")
+                    continue;
+
+                propertyCount++;
+
+                // Get field value
+                var fieldValue = fieldInfo.GetValue(command);
+
+                // Create field container
+                var fieldContainer = new VisualElement();
+                fieldContainer.style.flexDirection = FlexDirection.Row;
+                fieldContainer.style.alignItems = Align.Center;
+                fieldContainer.style.justifyContent = Justify.SpaceBetween;
+                fieldContainer.style.paddingLeft = 4;
+                fieldContainer.style.paddingRight = 4;
+                fieldContainer.style.paddingTop = 3;
+                fieldContainer.style.paddingBottom = 3;
+                fieldContainer.style.marginBottom = 4;
+                fieldContainer.style.borderBottomWidth = 1;
+                fieldContainer.style.borderBottomColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f));
+
+                // Field label
+                var fieldNameLabel = new Label(fieldInfo.Name);
+                fieldNameLabel.style.fontSize = 9;
+                fieldNameLabel.style.minWidth = 120;
+                fieldNameLabel.style.color = new StyleColor(new Color(0.7f, 0.7f, 0.7f));
+                fieldContainer.Add(fieldNameLabel);
+
+                // Field editor based on type
+                VisualElement fieldEditor = null;
+                
+                if (fieldInfo.FieldType == typeof(string))
+                {
+                    var textField = new TextField();
+                    textField.value = (string)fieldValue ?? "";
+                    textField.style.flexGrow = 1;
+                    textField.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = textField;
+                }
+                else if (fieldInfo.FieldType == typeof(int))
+                {
+                    var intField = new IntegerField();
+                    intField.value = (int)fieldValue;
+                    intField.style.flexGrow = 1;
+                    intField.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = intField;
+                }
+                else if (fieldInfo.FieldType == typeof(float))
+                {
+                    var floatField = new FloatField();
+                    floatField.value = (float)fieldValue;
+                    floatField.style.flexGrow = 1;
+                    floatField.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = floatField;
+                }
+                else if (fieldInfo.FieldType == typeof(bool))
+                {
+                    var boolField = new Toggle();
+                    boolField.value = (bool)fieldValue;
+                    boolField.style.flexGrow = 1;
+                    boolField.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = boolField;
+                }
+                else if (fieldInfo.FieldType == typeof(Vector2))
+                {
+                    var v2Field = new Vector2Field();
+                    v2Field.value = (Vector2)fieldValue;
+                    v2Field.style.flexGrow = 1;
+                    v2Field.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = v2Field;
+                }
+                else if (fieldInfo.FieldType == typeof(Vector3))
+                {
+                    var v3Field = new Vector3Field();
+                    v3Field.value = (Vector3)fieldValue;
+                    v3Field.style.flexGrow = 1;
+                    v3Field.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = v3Field;
+                }
+                else if (fieldInfo.FieldType == typeof(Vector4))
+                {
+                    var v4Field = new Vector4Field();
+                    v4Field.value = (Vector4)fieldValue;
+                    v4Field.style.flexGrow = 1;
+                    v4Field.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = v4Field;
+                }
+                else if (fieldInfo.FieldType == typeof(Color))
+                {
+                    var colorField = new ColorField();
+                    colorField.value = (Color)fieldValue;
+                    colorField.style.flexGrow = 1;
+                    colorField.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = colorField;
+                }
+                else if (typeof(UnityEngine.Object).IsAssignableFrom(fieldInfo.FieldType))
+                {
+                    var objField = new ObjectField();
+                    objField.objectType = fieldInfo.FieldType;
+                    objField.value = fieldValue as UnityEngine.Object;
+                    objField.style.flexGrow = 1;
+                    objField.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = objField;
+                }
+                else if (fieldInfo.FieldType.IsEnum)
+                {
+                    var enumField = new EnumField((System.Enum)fieldValue);
+                    enumField.style.flexGrow = 1;
+                    enumField.RegisterValueChangedCallback(evt =>
+                    {
+                        fieldInfo.SetValue(command, evt.newValue);
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    });
+                    fieldEditor = enumField;
+                }
+                else
+                {
+                    // For unsupported types, show read-only label
+                    var valueLabel = new Label(fieldValue?.ToString() ?? "null");
+                    valueLabel.style.fontSize = 9;
+                    valueLabel.style.color = new StyleColor(new Color(0.5f, 0.5f, 0.5f));
+                    valueLabel.style.flexGrow = 1;
+                    fieldEditor = valueLabel;
+                }
+
+                if (fieldEditor != null)
+                {
+                    fieldEditor.style.minWidth = 150;
+                    fieldContainer.Add(fieldEditor);
+                }
+
+                container.Add(fieldContainer);
             }
 
             // If no properties found, show a message
-            if (container.childCount == 0)
+            if (propertyCount == 0)
             {
-                var emptyLabel = new Label("No properties to display");
+                var emptyLabel = new Label("No public fields");
                 emptyLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
-                emptyLabel.style.fontSize = 10;
+                emptyLabel.style.fontSize = 9;
                 container.Add(emptyLabel);
             }
         }

@@ -9,9 +9,9 @@ namespace UniGame.UniBuild.Editor.Inspector
 
     /// <summary>
     /// Settings for the Build Pipeline Inspector editor
-    /// Stored as ScriptableSingleton to persist user preferences
+    /// Stored as ScriptableSingleton to persist user preferences in project settings
     /// </summary>
-    public class BuildPipelineInspectorSettings : ScriptableObject
+    public class BuildPipelineInspectorSettings : ScriptableSingleton<BuildPipelineInspectorSettings>
     {
         [SerializeField]
         private string pipelineCreationPath = "Assets/BuildPipelines";
@@ -28,13 +28,26 @@ namespace UniGame.UniBuild.Editor.Inspector
         [SerializeField]
         private bool enableDetailedLogging = false;
 
+        private BuildPipelineInspectorSettings()
+        {
+            // Private constructor to prevent direct instantiation
+            // ScriptableSingleton handles creation internally
+        }
+
         /// <summary>
         /// Default path for creating new pipelines
         /// </summary>
         public string PipelineCreationPath
         {
             get => pipelineCreationPath;
-            set => pipelineCreationPath = value;
+            set
+            {
+                if (pipelineCreationPath != value)
+                {
+                    pipelineCreationPath = value;
+                    EditorUtility.SetDirty(this);
+                }
+            }
         }
 
         /// <summary>
@@ -43,7 +56,14 @@ namespace UniGame.UniBuild.Editor.Inspector
         public bool AutoRefreshPipelines
         {
             get => autoRefreshPipelines;
-            set => autoRefreshPipelines = value;
+            set
+            {
+                if (autoRefreshPipelines != value)
+                {
+                    autoRefreshPipelines = value;
+                    EditorUtility.SetDirty(this);
+                }
+            }
         }
 
         /// <summary>
@@ -52,7 +72,15 @@ namespace UniGame.UniBuild.Editor.Inspector
         public int MaxHistorySize
         {
             get => maxHistorySize;
-            set => maxHistorySize = Mathf.Max(10, value);
+            set
+            {
+                int newValue = Mathf.Max(10, value);
+                if (maxHistorySize != newValue)
+                {
+                    maxHistorySize = newValue;
+                    EditorUtility.SetDirty(this);
+                }
+            }
         }
 
         /// <summary>
@@ -61,7 +89,14 @@ namespace UniGame.UniBuild.Editor.Inspector
         public bool ShowCommandDescriptions
         {
             get => showCommandDescriptions;
-            set => showCommandDescriptions = value;
+            set
+            {
+                if (showCommandDescriptions != value)
+                {
+                    showCommandDescriptions = value;
+                    EditorUtility.SetDirty(this);
+                }
+            }
         }
 
         /// <summary>
@@ -70,20 +105,33 @@ namespace UniGame.UniBuild.Editor.Inspector
         public bool EnableDetailedLogging
         {
             get => enableDetailedLogging;
-            set => enableDetailedLogging = value;
+            set
+            {
+                if (enableDetailedLogging != value)
+                {
+                    enableDetailedLogging = value;
+                    EditorUtility.SetDirty(this);
+                }
+            }
         }
 
         /// <summary>
-        /// Get or create the singleton instance
+        /// Get the singleton instance (automatically created if needed)
         /// </summary>
-        public static BuildPipelineInspectorSettings GetOrCreate()
+        public static BuildPipelineInspectorSettings GetSettings()
         {
-#if UNITY_EDITOR
-            var instance = ScriptableObject.CreateInstance<BuildPipelineInspectorSettings>();
+            // Access instance property to ensure singleton is loaded
+            // This is safe to call after initialization
             return instance;
-#else
-            return null;
-#endif
+        }
+
+        /// <summary>
+        /// Check if the singleton has been initialized
+        /// </summary>
+        public static bool IsInitialized()
+        {
+            // Check if instance has been created without triggering lazy initialization
+            return instance != null;
         }
     }
 }
