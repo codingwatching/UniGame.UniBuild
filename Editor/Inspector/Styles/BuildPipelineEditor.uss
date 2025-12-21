@@ -1,0 +1,316 @@
+/* Build Pipeline Editor Styles */
+/* Uses relative paths for portability across different folder locations */
+
+:root {
+    --color-background: rgb(56, 56, 56);
+    --color-background-light: rgb(70, 70, 70);
+    --color-text: rgb(200, 200, 200);
+    --color-text-dim: rgb(150, 150, 150);
+    --color-border: rgb(35, 35, 35);
+    --color-border-light: rgb(80, 80, 80);
+    --color-success: rgb(76, 175, 80);
+    --color-error: rgb(244, 67, 54);
+    --color-warning: rgb(255, 193, 7);
+    --color-primary: rgb(66, 133, 244);
+    --color-primary-hover: rgb(80, 150, 255);
+    --font-size-title: 16px;
+    --font-size-normal: 12px;
+    --font-size-small: 10px;
+    --padding-standard: 8px;
+    --margin-standard: 4px;
+    --border-radius: 4px;
+}
+
+/* Root Container */
+.root-container {
+    flex-grow: 1;
+    flex-direction: column;
+    background-color: var(--color-background);
+}
+
+/* Header */
+.header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--padding-standard);
+    background-color: rgb(40, 40, 40);
+    border-bottom-width: 2px;
+    border-bottom-color: var(--color-border);
+    min-height: 40px;
+}
+
+.header-title {
+    font-size: var(--font-size-title);
+    -unity-font-style: bold;
+    color: var(--color-text);
+    margin-right: 16px;
+}
+
+.header-controls {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-label {
+    font-size: var(--font-size-small);
+    color: var(--color-text-dim);
+    min-width: 200px;
+    text-align: right;
+}
+
+/* Buttons */
+.button-control {
+    padding: 6px 12px;
+    font-size: var(--font-size-normal);
+    background-color: var(--color-background-light);
+    border-color: var(--color-border-light);
+    border-width: 1px;
+    border-radius: var(--border-radius);
+    min-width: 80px;
+}
+
+.button-control:hover {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary-hover);
+}
+
+.button-execute {
+    background-color: var(--color-success);
+    border-color: rgb(56, 142, 60);
+    color: white;
+    font-weight: bold;
+}
+
+.button-execute:hover {
+    background-color: rgb(104, 209, 84);
+}
+
+.button-create {
+    background-color: var(--color-primary);
+    border-color: rgb(66, 133, 244);
+    color: white;
+    font-weight: bold;
+}
+
+.button-create:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.button-danger {
+    background-color: var(--color-error);
+    border-color: rgb(211, 47, 47);
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    font-size: var(--font-size-small);
+}
+
+.button-danger:hover {
+    background-color: rgb(229, 57, 53);
+}
+
+/* Tabs */
+.tab-view {
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+.tab-header {
+    flex-direction: row;
+    background-color: var(--color-background-light);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+    padding: 0;
+    height: 32px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 8px 16px;
+    background-color: transparent;
+    border: none;
+    border-bottom-width: 2px;
+    border-bottom-color: transparent;
+    color: var(--color-text-dim);
+    font-size: var(--font-size-normal);
+    border-radius: 0;
+}
+
+.tab-button:hover {
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
+
+.tab-button.active {
+    border-bottom-color: var(--color-primary);
+    color: var(--color-text);
+    background-color: var(--color-background);
+}
+
+.tab-content {
+    flex-grow: 1;
+    flex-direction: column;
+    padding: var(--padding-standard);
+}
+
+/* Search Fields */
+TextField {
+    font-size: var(--font-size-normal);
+    padding: 6px 8px;
+    background-color: var(--color-background-light);
+    border-color: var(--color-border-light);
+    border-width: 1px;
+    border-radius: var(--border-radius);
+}
+
+TextField:focus {
+    border-color: var(--color-primary);
+    background-color: rgb(80, 80, 80);
+}
+
+/* Pipeline List */
+.pipeline-list-item {
+    background-color: var(--color-background-light);
+    border-width: 1px;
+    border-color: var(--color-border-light);
+    border-radius: var(--border-radius);
+    padding: 8px 12px;
+    margin-bottom: 4px;
+}
+
+.pipeline-list-item:hover {
+    background-color: rgb(85, 85, 85);
+    border-color: var(--color-primary);
+}
+
+.pipeline-list-item:active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary-hover);
+}
+
+.pipeline-name {
+    font-size: var(--font-size-normal);
+    -unity-font-style: bold;
+    color: var(--color-text);
+    margin-bottom: 4px;
+}
+
+/* Pipeline Editor */
+.pipeline-step-item {
+    background-color: var(--color-background-light);
+    border-width: 2px;
+    border-radius: var(--border-radius);
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.pipeline-step-item:hover {
+    background-color: rgb(85, 85, 85);
+}
+
+/* Command Catalog */
+.command-category {
+    margin-bottom: 8px;
+}
+
+.command-catalog-item {
+    background-color: var(--color-background-light);
+    padding: 8px 12px;
+    margin-bottom: 2px;
+    border-radius: var(--border-radius);
+}
+
+.command-catalog-item:hover {
+    background-color: rgb(85, 85, 85);
+}
+
+.command-name {
+    font-size: var(--font-size-normal);
+    -unity-font-style: bold;
+    color: var(--color-text);
+    margin-bottom: 4px;
+}
+
+.command-description {
+    font-size: var(--font-size-small);
+    color: var(--color-text-dim);
+    white-space: normal;
+    word-wrap: true;
+    margin-bottom: 4px;
+}
+
+/* Foldout */
+Foldout {
+    padding: 4px 8px;
+    margin-bottom: 4px;
+}
+
+Foldout > Toggle {
+    padding: 4px;
+}
+
+/* Scroll View */
+ScrollView {
+    flex-grow: 1;
+}
+
+/* Labels and Text */
+Label {
+    color: var(--color-text);
+    font-size: var(--font-size-normal);
+    white-space: normal;
+}
+
+Label.label-info {
+    font-size: var(--font-size-small);
+    color: var(--color-text-dim);
+}
+
+/* Toggles */
+Toggle {
+    padding: 6px 8px;
+    margin: 4px 0;
+}
+
+Toggle > Label {
+    font-size: var(--font-size-normal);
+}
+
+/* Field Containers */
+.settings-container {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+}
+
+/* Utility Classes */
+.flex-grow {
+    flex-grow: 1;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.hidden {
+    display: none;
+}
+
+.space-between {
+    justify-content: space-between;
+}
+
+.selected-pipeline-name {
+    font-size: var(--font-size-normal);
+    -unity-font-style: bold;
+    color: var(--color-primary);
+}

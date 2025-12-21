@@ -2,6 +2,7 @@
 namespace UniGame.UniBuild.Editor
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using Abstract;
     using UnityEngine;
@@ -17,7 +18,7 @@ namespace UniGame.UniBuild.Editor
     
     [Serializable]
     [MovedFrom(sourceNamespace:"UniModules.UniGame.UniBuild")]
-    public class BuildCommands : IBuildCommands
+    public class BuildCommands : IBuildCommands,IEnumerable<IUnityBuildCommand>
     {
         private static Color _oddColor = new Color(0.2f, 0.4f, 0.3f);
         
@@ -50,6 +51,22 @@ namespace UniGame.UniBuild.Editor
             var result = index % 2 == 0 
                 ? _oddColor : defaultColor;
             return result;
+        }
+
+        public IEnumerator<IUnityBuildCommand> GetEnumerator()
+        {
+            foreach (var buildCommand in Commands)
+            {
+                yield return  buildCommand;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            foreach (var buildCommand in Commands)
+            {
+                yield return  buildCommand;
+            }
         }
     }
 }
