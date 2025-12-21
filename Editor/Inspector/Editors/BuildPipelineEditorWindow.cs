@@ -1074,6 +1074,11 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                     });
                     fieldEditor = enumField;
                 }
+                else if (IsSerializableType(fieldInfo.FieldType))
+                {
+                    // For serializable types, create a sub-container with nested fields
+                    fieldEditor = null; // Will be handled specially below
+                }
                 else
                 {
                     // For unsupported types, show read-only label
@@ -1091,6 +1096,142 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 }
 
                 container.Add(fieldContainer);
+
+                // For serializable types, display their nested fields
+                if (IsSerializableType(fieldInfo.FieldType) && fieldValue != null)
+                {
+                    var nestedFields = fieldInfo.FieldType.GetFields(BindingFlags.Public | BindingFlags.Instance);
+                    
+                    if (nestedFields.Length > 0)
+                    {
+                        var nestedContainer = new VisualElement();
+                        nestedContainer.style.flexDirection = FlexDirection.Column;
+                        nestedContainer.style.paddingLeft = 20;
+                        nestedContainer.style.marginLeft = 8;
+                        nestedContainer.style.borderLeftWidth = 1;
+                        nestedContainer.style.borderLeftColor = new StyleColor(new Color(0.3f, 0.3f, 0.3f));
+
+                        foreach (var nestedFieldInfo in nestedFields)
+                        {
+                            // Skip backing fields
+                            if (nestedFieldInfo.Name.StartsWith("<") || nestedFieldInfo.Name.StartsWith("m_"))
+                                continue;
+
+                            var nestedValue = nestedFieldInfo.GetValue(fieldValue);
+
+                            var nestedFieldContainer = new VisualElement();
+                            nestedFieldContainer.style.flexDirection = FlexDirection.Row;
+                            nestedFieldContainer.style.alignItems = Align.Center;
+                            nestedFieldContainer.style.justifyContent = Justify.SpaceBetween;
+                            nestedFieldContainer.style.paddingLeft = 4;
+                            nestedFieldContainer.style.paddingRight = 4;
+                            nestedFieldContainer.style.paddingTop = 3;
+                            nestedFieldContainer.style.paddingBottom = 3;
+                            nestedFieldContainer.style.marginBottom = 4;
+                            nestedFieldContainer.style.borderBottomWidth = 1;
+                            nestedFieldContainer.style.borderBottomColor = new StyleColor(new Color(0.15f, 0.15f, 0.15f));
+
+                            var nestedLabel = new Label(nestedFieldInfo.Name);
+                            nestedLabel.style.fontSize = 9;
+                            nestedLabel.style.minWidth = 120;
+                            nestedLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                            nestedFieldContainer.Add(nestedLabel);
+
+                            VisualElement nestedEditor = null;
+
+                            if (nestedFieldInfo.FieldType == typeof(string))
+                            {
+                                var textField = new TextField();
+                                textField.value = (string)nestedValue ?? "";
+                                textField.style.flexGrow = 1;
+                                textField.RegisterValueChangedCallback(evt =>
+                                {
+                                    nestedFieldInfo.SetValue(fieldValue, evt.newValue);
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                nestedEditor = textField;
+                            }
+                            else if (nestedFieldInfo.FieldType == typeof(int))
+                            {
+                                var intField = new IntegerField();
+                                intField.value = (int)nestedValue;
+                                intField.style.flexGrow = 1;
+                                intField.RegisterValueChangedCallback(evt =>
+                                {
+                                    nestedFieldInfo.SetValue(fieldValue, evt.newValue);
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                nestedEditor = intField;
+                            }
+                            else if (nestedFieldInfo.FieldType == typeof(float))
+                            {
+                                var floatField = new FloatField();
+                                floatField.value = (float)nestedValue;
+                                floatField.style.flexGrow = 1;
+                                floatField.RegisterValueChangedCallback(evt =>
+                                {
+                                    nestedFieldInfo.SetValue(fieldValue, evt.newValue);
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                nestedEditor = floatField;
+                            }
+                            else if (nestedFieldInfo.FieldType == typeof(bool))
+                            {
+                                var boolField = new Toggle();
+                                boolField.value = (bool)nestedValue;
+                                boolField.style.flexGrow = 1;
+                                boolField.RegisterValueChangedCallback(evt =>
+                                {
+                                    nestedFieldInfo.SetValue(fieldValue, evt.newValue);
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                nestedEditor = boolField;
+                            }
+                            else if (nestedFieldInfo.FieldType.IsEnum)
+                            {
+                                var enumField = new EnumField((System.Enum)nestedValue);
+                                enumField.style.flexGrow = 1;
+                                enumField.RegisterValueChangedCallback(evt =>
+                                {
+                                    nestedFieldInfo.SetValue(fieldValue, evt.newValue);
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                nestedEditor = enumField;
+                            }
+                            else if (typeof(UnityEngine.Object).IsAssignableFrom(nestedFieldInfo.FieldType))
+                            {
+                                var objField = new ObjectField();
+                                objField.objectType = nestedFieldInfo.FieldType;
+                                objField.value = nestedValue as UnityEngine.Object;
+                                objField.style.flexGrow = 1;
+                                objField.RegisterValueChangedCallback(evt =>
+                                {
+                                    nestedFieldInfo.SetValue(fieldValue, evt.newValue);
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                nestedEditor = objField;
+                            }
+                            else
+                            {
+                                var valueLabel = new Label(nestedValue?.ToString() ?? "null");
+                                valueLabel.style.fontSize = 9;
+                                valueLabel.style.color = new StyleColor(new Color(0.5f, 0.5f, 0.5f));
+                                valueLabel.style.flexGrow = 1;
+                                nestedEditor = valueLabel;
+                            }
+
+                            if (nestedEditor != null)
+                            {
+                                nestedEditor.style.minWidth = 150;
+                                nestedFieldContainer.Add(nestedEditor);
+                            }
+
+                            nestedContainer.Add(nestedFieldContainer);
+                        }
+
+                        container.Add(nestedContainer);
+                    }
+                }
             }
 
             // If no properties found, show a message
@@ -1101,6 +1242,20 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 emptyLabel.style.fontSize = 9;
                 container.Add(emptyLabel);
             }
+        }
+
+        private bool IsSerializableType(Type type)
+        {
+            // Check if type is marked with [Serializable] attribute
+            if (type.GetCustomAttributes(typeof(SerializableAttribute), false).Length > 0)
+                return true;
+
+            // Check if it's a custom class (not a primitive, string, or known unsupported types)
+            if (type.IsValueType || type == typeof(string) || type.IsEnum || type.IsArray)
+                return false;
+
+            // If it's a class, check if it has SerializableAttribute
+            return type.IsClass && !typeof(UnityEngine.Object).IsAssignableFrom(type);
         }
 
         private void ExecuteStep(IUnityBuildCommand command)
