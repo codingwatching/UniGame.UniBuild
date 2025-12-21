@@ -91,9 +91,24 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             // Determine if this is a group command
             bool isGroupCommand = commands.Count > 0 && commands[0] is PipelineCommandsGroup;
             
-            // Create step header (shown outside foldout, visible even when collapsed)
+            // Create wrapper for foldout + header row on same level
+            var stepRow = new VisualElement();
+            stepRow.style.flexDirection = FlexDirection.Row;
+            stepRow.style.alignItems = Align.FlexStart;
+            
+            // Create step header (shown next to foldout, visible even when collapsed)
             var stepHeaderRow = CreateStepHeaderRow(commands, isGroupCommand);
-            container.Add(stepHeaderRow);
+            stepHeaderRow.style.alignSelf = Align.FlexStart;
+            
+            // Add foldout on the left, taking flex space
+            stepFoldout.style.flexGrow = 1;
+            stepFoldout.style.marginRight = UIThemeConstants.Spacing.SmallPadding;
+            stepRow.Add(stepFoldout);
+            
+            // Add buttons row on the right
+            stepRow.Add(stepHeaderRow);
+            
+            container.Add(stepRow);
 
             // Register drag-drop events on container with TrickleDown to ensure they're captured
             // even if child elements consume the event
@@ -109,17 +124,11 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
 
             // Prevent drag from starting when clicking on interactive elements (Foldout toggle, buttons)
             stepFoldout.RegisterCallback<MouseDownEvent>(evt => evt.StopPropagation());
-            
-            // If there are buttons in the header, prevent drag from them too
-            if (!isGroupCommand)
-            {
-                // The button row will have its own handlers that stop propagation
-            }
-            // Add content
+
+            // Add content inside foldout
             var contentContainer = CreateCommandsContent(commands);
             stepFoldout.Add(contentContainer);
             
-            container.Add(stepFoldout);
             return container;
         }
 
@@ -169,10 +178,12 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             buttons.Add(("Remove Step", () => OnRemove?.Invoke(_step), UIThemeConstants.Sizes.ButtonXLarge));
 
             var headerRow = UIElementFactory.CreateButtonRow(buttons.ToArray());
-            headerRow.style.paddingLeft = UIThemeConstants.Spacing.Padding;
+            headerRow.style.paddingLeft = 0;
             headerRow.style.paddingRight = UIThemeConstants.Spacing.Padding;
-            headerRow.style.paddingTop = UIThemeConstants.Spacing.SmallPadding;
-            headerRow.style.paddingBottom = UIThemeConstants.Spacing.SmallPadding;
+            headerRow.style.paddingTop = 0;
+            headerRow.style.paddingBottom = 0;
+            headerRow.style.marginTop = 0;
+            headerRow.style.marginBottom = 0;
             return headerRow;
         }
 
