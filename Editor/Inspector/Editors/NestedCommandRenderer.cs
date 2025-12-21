@@ -52,34 +52,46 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             if (_command == null)
                 return new VisualElement();
 
-            var itemContainer = new VisualElement();
-            itemContainer.style.flexDirection = FlexDirection.Column;
-            itemContainer.style.marginBottom = UIThemeConstants.Spacing.Padding;
-            itemContainer.style.paddingBottom = UIThemeConstants.Spacing.Padding;
+            var itemContainer = UIElementFactory.CreateAlternatingBgContainer(_index);
             itemContainer.style.borderBottomWidth = UIThemeConstants.Sizes.BorderWidth;
             itemContainer.style.borderBottomColor = new StyleColor(UIThemeConstants.Colors.BorderDefault);
+            itemContainer.style.paddingBottom = UIThemeConstants.Spacing.SmallPadding;
 
-            // Nested command header
+            // Nested command header (shown outside foldout, always visible)
             var headerRow = CreateNestedCommandHeader();
             itemContainer.Add(headerRow);
 
-            // Register drag-drop events
-            itemContainer.RegisterCallback<MouseDownEvent>(evt => OnMouseDown?.Invoke(evt, _step, _group));
-            itemContainer.RegisterCallback<MouseMoveEvent>(evt => OnMouseMove?.Invoke(evt, itemContainer, _step, _group));
-            itemContainer.RegisterCallback<MouseEnterEvent>(evt => OnMouseEnter?.Invoke(evt, itemContainer, _step, _group));
-            itemContainer.RegisterCallback<MouseLeaveEvent>(evt => OnMouseLeave?.Invoke(evt, itemContainer, _step, _group));
-            itemContainer.RegisterCallback<MouseUpEvent>(evt => OnMouseUp?.Invoke(evt, _step, _group, itemContainer));
+            // Register drag-drop events with TrickleDown
+            itemContainer.RegisterCallback<MouseDownEvent>(evt => OnMouseDown?.Invoke(evt, _step, _group), TrickleDown.TrickleDown);
+            itemContainer.RegisterCallback<MouseMoveEvent>(evt => OnMouseMove?.Invoke(evt, itemContainer, _step, _group), TrickleDown.TrickleDown);
+            itemContainer.RegisterCallback<MouseEnterEvent>(evt => OnMouseEnter?.Invoke(evt, itemContainer, _step, _group), TrickleDown.TrickleDown);
+            itemContainer.RegisterCallback<MouseLeaveEvent>(evt => OnMouseLeave?.Invoke(evt, itemContainer, _step, _group), TrickleDown.TrickleDown);
+            itemContainer.RegisterCallback<MouseUpEvent>(evt => OnMouseUp?.Invoke(evt, _step, _group, itemContainer), TrickleDown.TrickleDown);
+
+            // Create foldout for properties (collapsed by default)
+            var propertiesFoldout = new Foldout
+            {
+                text = "Properties",
+                value = false
+            };
+            propertiesFoldout.style.fontSize = UIThemeConstants.FontSizes.Normal;
+            propertiesFoldout.style.paddingLeft = 0;
+            propertiesFoldout.style.marginBottom = 0;
+
+            // Prevent drag from starting when clicking on foldout
+            propertiesFoldout.RegisterCallback<MouseDownEvent>(evt => evt.StopPropagation());
 
             // Nested command properties
             var propsContainer = new VisualElement();
             propsContainer.style.flexDirection = FlexDirection.Column;
-            propsContainer.style.marginLeft = UIThemeConstants.Spacing.SmallPadding;
             propsContainer.style.paddingLeft = UIThemeConstants.Spacing.SmallPadding;
             propsContainer.style.paddingRight = UIThemeConstants.Spacing.SmallPadding;
 
             DisplayCommandProperties(propsContainer);
 
-            itemContainer.Add(propsContainer);
+            propertiesFoldout.Add(propsContainer);
+            itemContainer.Add(propertiesFoldout);
+            
             return itemContainer;
         }
 
@@ -92,45 +104,66 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             headerRow.style.flexDirection = FlexDirection.Row;
             headerRow.style.alignItems = Align.Center;
             headerRow.style.justifyContent = Justify.SpaceBetween;
-            headerRow.style.marginBottom = 6;
+            headerRow.style.paddingLeft = UIThemeConstants.Spacing.Padding;
+            headerRow.style.paddingRight = UIThemeConstants.Spacing.Padding;
+            headerRow.style.paddingTop = UIThemeConstants.Spacing.SmallPadding;
+            headerRow.style.paddingBottom = UIThemeConstants.Spacing.SmallPadding;
+
+            // Left section: toggle, type, name
+            var leftSection = new VisualElement();
+            leftSection.style.flexDirection = FlexDirection.Row;
+            leftSection.style.alignItems = Align.Center;
+            leftSection.style.flexGrow = 1;
 
             var toggle = new Toggle();
             toggle.value = _command.IsActive;
             toggle.style.marginRight = 6;
             toggle.RegisterValueChangedCallback(evt =>
             {
-                var field = _command.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
+                var field = _command.GetType().GetField("isActive", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Instance);
                 if (field != null)
                 {
                     field.SetValue(_command, evt.newValue);
                     EditorUtility.SetDirty(_selectedPipeline);
                 }
             });
-            headerRow.Add(toggle);
+            leftSection.Add(toggle);
 
             var nameLabel = new Label(_command.Name);
             nameLabel.style.fontSize = UIThemeConstants.FontSizes.Normal;
             nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             nameLabel.style.flexGrow = 1;
-            headerRow.Add(nameLabel);
+            leftSection.Add(nameLabel);
 
-            var typeLabel = UIElementFactory.CreateLabel(_command.GetType().Name, UIThemeConstants.FontSizes.Small);
-            typeLabel.style.marginRight = UIThemeConstants.Spacing.Padding;
-            headerRow.Add(typeLabel);
+            headerRow.Add(leftSection);
 
-            // Buttons
-            var moveUpBtn = UIElementFactory.CreateSmallButton("↑", () => { /* Move up */ });
-            headerRow.Add(moveUpBtn);
+            // Right section: buttons
+            var rightSection = new VisualElement();
+            rightSection.style.flexDirection = FlexDirection.Row;
+            rightSection.style.alignItems = Align.Center;
 
-            var moveDownBtn = UIElementFactory.CreateSmallButton("↓", () => { /* Move down */ });
-            headerRow.Add(moveDownBtn);
+            // Only show up arrow if not first in list
+            if (_index > 0)
+            {
+                var moveUpBtn = UIElementFactory.CreateButton("↑", () => { /* Move up */ }, UIThemeConstants.Sizes.ButtonSmall);
+                rightSection.Add(moveUpBtn);
+            }
+
+            // Only show down arrow if not last in list
+            var nestedCommandsList = _group.commands.commands.ToList();
+            if (_index < nestedCommandsList.Count - 1)
+            {
+                var moveDownBtn = UIElementFactory.CreateButton("↓", () => { /* Move down */ }, UIThemeConstants.Sizes.ButtonSmall);
+                rightSection.Add(moveDownBtn);
+            }
 
             var runBtn = UIElementFactory.CreateButton("Run", () => { /* Execute */ }, UIThemeConstants.Sizes.ButtonMedium);
-            headerRow.Add(runBtn);
+            rightSection.Add(runBtn);
 
             var delBtn = UIElementFactory.CreateDangerButton("Del", () => OnRemove?.Invoke(_step), UIThemeConstants.Sizes.ButtonSmall);
-            headerRow.Add(delBtn);
+            rightSection.Add(delBtn);
 
+            headerRow.Add(rightSection);
             return headerRow;
         }
 
@@ -155,6 +188,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 propertyCount++;
 
                 var fieldContainer = UIElementFactory.CreateLabeledRow(fieldInfo.Name, out var contentArea);
+                fieldContainer.style.marginBottom = UIThemeConstants.Spacing.SmallPadding;
                 
                 var fieldEditor = PropertyEditorFactory.CreateFieldEditor(fieldInfo, _command);
                 if (fieldEditor != null)

@@ -146,11 +146,19 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         /// </summary>
         private VisualElement CreateStepHeaderRow(List<IUnityBuildCommand> commands, bool isGroupCommand)
         {
-            var buttons = new List<(string, System.Action, int)>
+            var buttons = new List<(string, System.Action, int)>();
+            
+            // Only show up arrow if not first in list
+            if (_stepIndex > 0)
             {
-                ("↑", () => OnMoveUp?.Invoke(_step, _stepsList), UIThemeConstants.Sizes.ButtonSmall),
-                ("↓", () => OnMoveDown?.Invoke(_step, _stepsList), UIThemeConstants.Sizes.ButtonSmall),
-            };
+                buttons.Add(("↑", () => OnMoveUp?.Invoke(_step, _stepsList), UIThemeConstants.Sizes.ButtonSmall));
+            }
+            
+            // Only show down arrow if not last in list
+            if (_stepIndex < _stepsList.Count - 1)
+            {
+                buttons.Add(("↓", () => OnMoveDown?.Invoke(_step, _stepsList), UIThemeConstants.Sizes.ButtonSmall));
+            }
             
             // Add Run button only for non-group commands
             if (!isGroupCommand)

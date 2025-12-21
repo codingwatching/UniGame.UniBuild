@@ -55,23 +55,22 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var groupHeaderRow = CreateGroupHeader();
             groupWrapper.Add(groupHeaderRow);
 
-            // Nested commands foldout
-            var groupFoldout = new Foldout { text = "", value = true };
-            groupFoldout.style.fontSize = UIThemeConstants.FontSizes.Medium;
-            groupFoldout.style.paddingLeft = 0;
-            groupFoldout.style.marginLeft = UIThemeConstants.Spacing.Padding;
-            groupFoldout.style.marginRight = UIThemeConstants.Spacing.Padding;
-            groupFoldout.style.marginTop = 0;
-            groupFoldout.style.marginBottom = 0;
-
+            // Nested commands (no foldout - always visible)
             var nestedCommandsList = _group.commands.commands.ToList();
             if (nestedCommandsList.Count > 0)
             {
                 var nestedItemsContainer = CreateNestedCommandsContainer(nestedCommandsList);
-                groupFoldout.Add(nestedItemsContainer);
+                groupWrapper.Add(nestedItemsContainer);
+            }
+            else
+            {
+                // Show message if no commands
+                var emptyMsg = UIElementFactory.CreateDimmedLabel("No commands in this group");
+                emptyMsg.style.marginLeft = UIThemeConstants.Spacing.Padding;
+                emptyMsg.style.marginTop = UIThemeConstants.Spacing.Padding;
+                groupWrapper.Add(emptyMsg);
             }
 
-            groupWrapper.Add(groupFoldout);
             return groupWrapper;
         }
 
@@ -124,38 +123,50 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             rightSection.style.flexDirection = FlexDirection.Row;
             rightSection.style.alignItems = Align.Center;
 
-            // Add reorder buttons for the command group itself
-            var moveUpBtn = UIElementFactory.CreateButton("↑", () => 
-            {
-                // Move group up in the parent step
-                var parentStep = _step;
-                var groupIndex = parentStep.GetCommands().ToList().IndexOf(_group);
-                if (groupIndex > 0)
-                {
-                    var commands = parentStep.GetCommands().ToList();
-                    var temp = commands[groupIndex];
-                    commands[groupIndex] = commands[groupIndex - 1];
-                    commands[groupIndex - 1] = temp;
-                    EditorUtility.SetDirty(_selectedPipeline);
-                }
-            }, UIThemeConstants.Sizes.ButtonSmall);
-            rightSection.Add(moveUpBtn);
+            // Get group index in parent step
+            var parentCommands = _step.GetCommands().ToList();
+            var groupIndex = parentCommands.IndexOf(_group);
 
-            var moveDownBtn = UIElementFactory.CreateButton("↓", () => 
+            // Add reorder buttons for the command group itself
+            // Only show up arrow if not first in list
+            if (groupIndex > 0)
             {
-                // Move group down in the parent step
-                var parentStep = _step;
-                var commands = parentStep.GetCommands().ToList();
-                var groupIndex = commands.IndexOf(_group);
-                if (groupIndex < commands.Count - 1)
+                var moveUpBtn = UIElementFactory.CreateButton("↑", () => 
                 {
-                    var temp = commands[groupIndex];
-                    commands[groupIndex] = commands[groupIndex + 1];
-                    commands[groupIndex + 1] = temp;
-                    EditorUtility.SetDirty(_selectedPipeline);
-                }
-            }, UIThemeConstants.Sizes.ButtonSmall);
-            rightSection.Add(moveDownBtn);
+                    // Move group up in the parent step
+                    var parentStep = _step;
+                    var commands = parentStep.GetCommands().ToList();
+                    var idx = commands.IndexOf(_group);
+                    if (idx > 0)
+                    {
+                        var temp = commands[idx];
+                        commands[idx] = commands[idx - 1];
+                        commands[idx - 1] = temp;
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    }
+                }, UIThemeConstants.Sizes.ButtonSmall);
+                rightSection.Add(moveUpBtn);
+            }
+
+            // Only show down arrow if not last in list
+            if (groupIndex < parentCommands.Count - 1)
+            {
+                var moveDownBtn = UIElementFactory.CreateButton("↓", () => 
+                {
+                    // Move group down in the parent step
+                    var parentStep = _step;
+                    var commands = parentStep.GetCommands().ToList();
+                    var idx = commands.IndexOf(_group);
+                    if (idx < commands.Count - 1)
+                    {
+                        var temp = commands[idx];
+                        commands[idx] = commands[idx + 1];
+                        commands[idx + 1] = temp;
+                        EditorUtility.SetDirty(_selectedPipeline);
+                    }
+                }, UIThemeConstants.Sizes.ButtonSmall);
+                rightSection.Add(moveDownBtn);
+            }
 
             var groupRunBtn = UIElementFactory.CreateButton("Run", () => { /* Execute group */ }, UIThemeConstants.Sizes.ButtonMedium);
             rightSection.Add(groupRunBtn);
@@ -179,7 +190,9 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         {
             var nestedItemsContainer = new VisualElement();
             nestedItemsContainer.style.flexDirection = FlexDirection.Column;
-            nestedItemsContainer.style.marginLeft = 12;
+            nestedItemsContainer.style.marginTop = UIThemeConstants.Spacing.Padding;
+            nestedItemsContainer.style.marginLeft = UIThemeConstants.Spacing.Padding;
+            nestedItemsContainer.style.marginRight = UIThemeConstants.Spacing.Padding;
             nestedItemsContainer.style.borderLeftWidth = UIThemeConstants.Sizes.BorderWidth;
             nestedItemsContainer.style.borderLeftColor = new StyleColor(new Color(0.4f, 0.6f, 0.8f));
             nestedItemsContainer.style.paddingLeft = UIThemeConstants.Spacing.Padding;
