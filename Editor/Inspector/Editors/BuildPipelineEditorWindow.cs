@@ -477,6 +477,18 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             item.style.marginBottom = 4;
             item.style.flexDirection = FlexDirection.Column;
 
+            // Highlight selected pipeline
+            if (pipeline == _selectedPipeline)
+            {
+                item.style.backgroundColor = new StyleColor(new Color(0.2f, 0.4f, 0.6f, 0.8f));
+                item.style.borderLeftWidth = 3;
+                item.style.borderLeftColor = new StyleColor(new Color(0.4f, 0.8f, 1.0f));
+            }
+            else
+            {
+                item.style.backgroundColor = new StyleColor(new Color(0.15f, 0.15f, 0.15f));
+            }
+
             // Get asset file name from the asset path
             var assetPath = AssetDatabase.GetAssetPath(pipeline);
             var assetName = Path.GetFileNameWithoutExtension(assetPath);
@@ -498,6 +510,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         private void SelectPipeline(UniBuildPipeline pipeline)
         {
             _selectedPipeline = pipeline;
+            RefreshPipelineList(); // Update list to show new selection highlight
             RefreshPipelineEditor();
             UpdateStatusLabel($"Selected: {pipeline.name}");
         }
@@ -1224,6 +1237,11 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                     });
                     fieldEditor = enumField;
                 }
+                else if (IsListType(fieldInfo.FieldType))
+                {
+                    // For List types, don't create inline editor - will be displayed as a foldout below
+                    fieldEditor = null;
+                }
                 else if (IsSerializableType(fieldInfo.FieldType))
                 {
                     // For serializable types, create a sub-container with nested fields
@@ -1246,6 +1264,116 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 }
 
                 container.Add(fieldContainer);
+
+                // For List types, display items in a foldout
+                if (IsListType(fieldInfo.FieldType) && fieldValue != null)
+                {
+                    var listInstance = fieldValue as System.Collections.IList;
+                    if (listInstance != null && listInstance.Count > 0)
+                    {
+                        var listFoldout = new Foldout { text = $"{fieldInfo.Name} ({listInstance.Count} items)", value = false };
+                        listFoldout.style.fontSize = 10;
+                        listFoldout.style.marginLeft = 8;
+                        listFoldout.style.marginBottom = 8;
+
+                        var listItemsContainer = new VisualElement();
+                        listItemsContainer.style.flexDirection = FlexDirection.Column;
+                        listItemsContainer.style.paddingLeft = 12;
+
+                        for (int i = 0; i < listInstance.Count; i++)
+                        {
+                            var item = listInstance[i];
+                            var itemContainer = new VisualElement();
+                            itemContainer.style.flexDirection = FlexDirection.Row;
+                            itemContainer.style.alignItems = Align.Center;
+                            itemContainer.style.justifyContent = Justify.SpaceBetween;
+                            itemContainer.style.paddingLeft = 4;
+                            itemContainer.style.paddingRight = 4;
+                            itemContainer.style.paddingTop = 2;
+                            itemContainer.style.paddingBottom = 2;
+                            itemContainer.style.marginBottom = 4;
+                            itemContainer.style.borderBottomWidth = 1;
+                            itemContainer.style.borderBottomColor = new StyleColor(new Color(0.15f, 0.15f, 0.15f));
+
+                            var itemIndexLabel = new Label($"[{i}]");
+                            itemIndexLabel.style.fontSize = 9;
+                            itemIndexLabel.style.minWidth = 30;
+                            itemIndexLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                            itemContainer.Add(itemIndexLabel);
+
+                            int indexCopy = i; // For closure
+                            
+                            if (item == null)
+                            {
+                                var nullLabel = new Label("null");
+                                nullLabel.style.fontSize = 9;
+                                nullLabel.style.color = new StyleColor(new Color(0.5f, 0.5f, 0.5f));
+                                itemContainer.Add(nullLabel);
+                            }
+                            else if (item is string)
+                            {
+                                var stringField = new TextField();
+                                stringField.value = (string)item;
+                                stringField.style.flexGrow = 1;
+                                stringField.RegisterValueChangedCallback(evt =>
+                                {
+                                    listInstance[indexCopy] = evt.newValue;
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                itemContainer.Add(stringField);
+                            }
+                            else if (item is int)
+                            {
+                                var intField = new IntegerField();
+                                intField.value = (int)item;
+                                intField.style.flexGrow = 1;
+                                intField.RegisterValueChangedCallback(evt =>
+                                {
+                                    listInstance[indexCopy] = evt.newValue;
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                itemContainer.Add(intField);
+                            }
+                            else if (item is float)
+                            {
+                                var floatField = new FloatField();
+                                floatField.value = (float)item;
+                                floatField.style.flexGrow = 1;
+                                floatField.RegisterValueChangedCallback(evt =>
+                                {
+                                    listInstance[indexCopy] = evt.newValue;
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                itemContainer.Add(floatField);
+                            }
+                            else if (item is bool)
+                            {
+                                var boolField = new Toggle();
+                                boolField.value = (bool)item;
+                                boolField.style.flexGrow = 1;
+                                boolField.RegisterValueChangedCallback(evt =>
+                                {
+                                    listInstance[indexCopy] = evt.newValue;
+                                    EditorUtility.SetDirty(_selectedPipeline);
+                                });
+                                itemContainer.Add(boolField);
+                            }
+                            else
+                            {
+                                var valueLabel = new Label(item.ToString());
+                                valueLabel.style.fontSize = 9;
+                                valueLabel.style.color = new StyleColor(new Color(0.5f, 0.5f, 0.5f));
+                                valueLabel.style.flexGrow = 1;
+                                itemContainer.Add(valueLabel);
+                            }
+
+                            listItemsContainer.Add(itemContainer);
+                        }
+
+                        listFoldout.Add(listItemsContainer);
+                        container.Add(listFoldout);
+                    }
+                }
 
                 // For serializable types, display their nested fields
                 if (IsSerializableType(fieldInfo.FieldType) && fieldValue != null)
@@ -1392,6 +1520,17 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 emptyLabel.style.fontSize = 9;
                 container.Add(emptyLabel);
             }
+        }
+
+        private bool IsListType(Type type)
+        {
+            // Check if type is a generic List<T>
+            if (type.IsGenericType)
+            {
+                var genericDef = type.GetGenericTypeDefinition();
+                return genericDef == typeof(System.Collections.Generic.List<>);
+            }
+            return false;
         }
 
         private bool IsSerializableType(Type type)
