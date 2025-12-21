@@ -13,8 +13,8 @@ namespace UniModules.UniGame.UniBuild
     using TriInspector;
 #endif
     
-    [CreateAssetMenu(menuName = "UniBuild/ScriptableCommandsGroup",fileName = nameof(ScriptableCommandsGroup))]
-    public class ScriptableCommandsGroup : UnityBuildCommand
+    [CreateAssetMenu(menuName = "UniBuild/ScriptableCommandsGroup",fileName = nameof(PipelineCommandsGroup))]
+    public class PipelineCommandsGroup : UnityBuildCommand
     {
         /// <summary>
         /// you can set build arguments with inspector

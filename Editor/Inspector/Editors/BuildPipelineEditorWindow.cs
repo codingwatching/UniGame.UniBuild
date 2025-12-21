@@ -731,7 +731,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                     }
                 }
 
-                var pipeline = ScriptableObject.CreateInstance<ScriptableCommandsGroup>();
+                var pipeline = ScriptableObject.CreateInstance<PipelineCommandsGroup>();
                 var assetPath = AssetDatabase.GenerateUniqueAssetPath($"{path}/BuildPipeline.asset");
                 AssetDatabase.CreateAsset(pipeline, assetPath);
                 AssetDatabase.SaveAssets();

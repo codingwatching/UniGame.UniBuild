@@ -17,15 +17,15 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Load all available pipelines in the project
         /// </summary>
-        public static List<ScriptableCommandsGroup> LoadAllPipelines()
+        public static List<PipelineCommandsGroup> LoadAllPipelines()
         {
-            var pipelines = new List<ScriptableCommandsGroup>();
+            var pipelines = new List<PipelineCommandsGroup>();
             var guids = AssetDatabase.FindAssets("t:ScriptableCommandsGroup");
 
             foreach (var guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
-                var pipeline = AssetDatabase.LoadAssetAtPath<ScriptableCommandsGroup>(path);
+                var pipeline = AssetDatabase.LoadAssetAtPath<PipelineCommandsGroup>(path);
 
                 if (pipeline != null)
                 {
@@ -39,7 +39,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Search pipelines by name
         /// </summary>
-        public static List<ScriptableCommandsGroup> SearchPipelines(string searchQuery, List<ScriptableCommandsGroup> pipelines)
+        public static List<PipelineCommandsGroup> SearchPipelines(string searchQuery, List<PipelineCommandsGroup> pipelines)
         {
             var query = searchQuery.ToLower();
             return pipelines
@@ -51,7 +51,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Create a new pipeline at the specified path
         /// </summary>
-        public static ScriptableCommandsGroup CreatePipeline(string folderPath, string pipelineName)
+        public static PipelineCommandsGroup CreatePipeline(string folderPath, string pipelineName)
         {
             // Ensure folder exists
             if (!AssetDatabase.IsValidFolder(folderPath))
@@ -77,7 +77,7 @@ namespace UniGame.UniBuild.Editor.Inspector
             }
 
             // Create the pipeline asset
-            var pipeline = ScriptableObject.CreateInstance<ScriptableCommandsGroup>();
+            var pipeline = ScriptableObject.CreateInstance<PipelineCommandsGroup>();
             var assetPath = AssetDatabase.GenerateUniqueAssetPath($"{folderPath}/{pipelineName}.asset");
 
             AssetDatabase.CreateAsset(pipeline, assetPath);
@@ -90,7 +90,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Delete a pipeline
         /// </summary>
-        public static bool DeletePipeline(ScriptableCommandsGroup pipeline)
+        public static bool DeletePipeline(PipelineCommandsGroup pipeline)
         {
             if (pipeline == null) return false;
 
@@ -107,7 +107,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Duplicate a pipeline
         /// </summary>
-        public static ScriptableCommandsGroup DuplicatePipeline(ScriptableCommandsGroup source)
+        public static PipelineCommandsGroup DuplicatePipeline(PipelineCommandsGroup source)
         {
             if (source == null) return null;
 
@@ -123,13 +123,13 @@ namespace UniGame.UniBuild.Editor.Inspector
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            return AssetDatabase.LoadAssetAtPath<ScriptableCommandsGroup>(newPath);
+            return AssetDatabase.LoadAssetAtPath<PipelineCommandsGroup>(newPath);
         }
 
         /// <summary>
         /// Get pipeline path relative to Assets folder
         /// </summary>
-        public static string GetPipelinePath(ScriptableCommandsGroup pipeline)
+        public static string GetPipelinePath(PipelineCommandsGroup pipeline)
         {
             return AssetDatabase.GetAssetPath(pipeline);
         }
@@ -137,7 +137,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Get pipeline statistics
         /// </summary>
-        public static (int totalCount, int activeCount) GetPipelineStats(ScriptableCommandsGroup pipeline)
+        public static (int totalCount, int activeCount) GetPipelineStats(PipelineCommandsGroup pipeline)
         {
             if (pipeline?.commands?.commands == null)
                 return (0, 0);

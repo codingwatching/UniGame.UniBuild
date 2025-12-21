@@ -35,7 +35,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Execute a complete pipeline
         /// </summary>
-        public PipelineExecutionState ExecutePipeline(ScriptableCommandsGroup pipeline)
+        public PipelineExecutionState ExecutePipeline(PipelineCommandsGroup pipeline)
         {
             if (pipeline == null)
             {

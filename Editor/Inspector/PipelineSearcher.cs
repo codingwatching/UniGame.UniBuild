@@ -14,13 +14,13 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Search pipelines with advanced filtering
         /// </summary>
-        public static List<ScriptableCommandsGroup> SearchPipelinesByName(
-            List<ScriptableCommandsGroup> pipelines,
+        public static List<PipelineCommandsGroup> SearchPipelinesByName(
+            List<PipelineCommandsGroup> pipelines,
             string searchQuery,
             StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
             if (string.IsNullOrWhiteSpace(searchQuery))
-                return new List<ScriptableCommandsGroup>(pipelines);
+                return new List<PipelineCommandsGroup>(pipelines);
 
             var query = searchQuery.Trim();
             return pipelines
@@ -32,8 +32,8 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Search pipelines by step count
         /// </summary>
-        public static List<ScriptableCommandsGroup> SearchPipelinesByStepCount(
-            List<ScriptableCommandsGroup> pipelines,
+        public static List<PipelineCommandsGroup> SearchPipelinesByStepCount(
+            List<PipelineCommandsGroup> pipelines,
             int minSteps,
             int? maxSteps = null)
         {
@@ -47,8 +47,8 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Search pipelines by active status
         /// </summary>
-        public static List<ScriptableCommandsGroup> SearchPipelinesByActiveStatus(
-            List<ScriptableCommandsGroup> pipelines,
+        public static List<PipelineCommandsGroup> SearchPipelinesByActiveStatus(
+            List<PipelineCommandsGroup> pipelines,
             bool includeInactive = true)
         {
             if (includeInactive)
@@ -63,7 +63,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// Search steps in a pipeline
         /// </summary>
         public static List<IUnityBuildCommand> SearchSteps(
-            ScriptableCommandsGroup pipeline,
+            PipelineCommandsGroup pipeline,
             string searchQuery,
             StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
@@ -81,7 +81,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// Search steps by active status
         /// </summary>
         public static List<IUnityBuildCommand> SearchStepsByStatus(
-            ScriptableCommandsGroup pipeline,
+            PipelineCommandsGroup pipeline,
             bool? activeOnly = null)
         {
             if (pipeline == null)
@@ -99,7 +99,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// Search commands by type name
         /// </summary>
         public static List<IUnityBuildCommand> SearchStepsByType(
-            ScriptableCommandsGroup pipeline,
+            PipelineCommandsGroup pipeline,
             string typeName,
             StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
@@ -114,7 +114,7 @@ namespace UniGame.UniBuild.Editor.Inspector
         /// <summary>
         /// Get pipeline statistics for search results
         /// </summary>
-        public static PipelineSearchStatistics GetStatistics(List<ScriptableCommandsGroup> pipelines)
+        public static PipelineSearchStatistics GetStatistics(List<PipelineCommandsGroup> pipelines)
         {
             var totalSteps = 0;
             var activeSteps = 0;

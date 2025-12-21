@@ -33,7 +33,7 @@ namespace UniGame.UniBuild.Editor.Inspector
 
         // ============== Пример 2: Поиск пайплайна по имени ==============
 
-        public static ScriptableCommandsGroup Example_SearchPipeline(string pipelineName)
+        public static PipelineCommandsGroup Example_SearchPipeline(string pipelineName)
         {
 #if UNITY_EDITOR
             var pipelines = PipelineManager.LoadAllPipelines();
