@@ -55,6 +55,12 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         private UniBuildPipeline _selectedPipeline;
         private Dictionary<Type, BuildCommandMetadataAttribute> _commandMetadata;
         private List<PipelineExecutionState> _executionHistory = new List<PipelineExecutionState>();
+        // Drag-Drop tracking
+        private BuildCommandStep _draggedStep;
+        private PipelineCommandsGroup _draggedFromGroup;
+        private List<BuildCommandStep> _draggedFromList;
+        private VisualElement _draggedElementVisual;
+        private VisualElement _draggedElementClone;
 
         [MenuItem("UniGame/Uni Build/Pipeline Editor")]
         public static void ShowWindow()
@@ -652,6 +658,16 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 stepFoldout.Add(stepHeaderRow);
             }
 
+            // Setup drag-drop for the container
+            container.RegisterCallback<MouseDownEvent>(evt => OnStepMouseDown(evt, step, stepsList));
+            container.RegisterCallback<MouseMoveEvent>(evt => OnStepMouseMove(evt, container, step, stepsList));
+            container.RegisterCallback<MouseEnterEvent>(evt => OnStepMouseEnter(evt, container, step, stepsList));
+            container.RegisterCallback<MouseLeaveEvent>(evt => OnStepMouseLeave(evt, container, step, stepIndex));
+            container.RegisterCallback<MouseUpEvent>(evt => OnStepMouseUp(evt, step, stepsList, container));
+            
+            // Make container draggable by storing reference
+            container.userData = new StepDragData { step = step, stepsList = stepsList, originalBgColor = container.style.backgroundColor };
+
             // Create content container for all commands
             var contentContainer = new VisualElement();
             contentContainer.style.flexDirection = FlexDirection.Column;
@@ -911,6 +927,16 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                                 nestedHeaderRow.Add(nestedRemoveBtn);
 
                                 nestedItemContainer.Add(nestedHeaderRow);
+                                
+                                // Setup drag-drop for nested command
+                                nestedItemContainer.RegisterCallback<MouseDownEvent>(evt => OnNestedCommandMouseDown(evt, group, nestedStep));
+                                nestedItemContainer.RegisterCallback<MouseMoveEvent>(evt => OnNestedCommandMouseMove(evt, nestedItemContainer, group, nestedStep));
+                                nestedItemContainer.RegisterCallback<MouseEnterEvent>(evt => OnNestedCommandMouseEnter(evt, nestedItemContainer, group, nestedStep));
+                                nestedItemContainer.RegisterCallback<MouseLeaveEvent>(evt => OnNestedCommandMouseLeave(evt, nestedItemContainer, group, nestedStep));
+                                nestedItemContainer.RegisterCallback<MouseUpEvent>(evt => OnNestedCommandMouseUp(evt, group, nestedStep, nestedItemContainer));
+                                
+                                // Store reference for drag-drop
+                                nestedItemContainer.userData = new NestedCommandDragData { group = group, step = nestedStep, originalBgColor = nestedItemContainer.style.backgroundColor };
 
                                 // Nested command properties inline (no foldout)
                                 var nestedPropsContainer = new VisualElement();
@@ -1689,12 +1715,237 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
 
         private void RegisterEventHandlers()
         {
-            // Can be extended for additional event handling
+            // Register global mouse up handler to ensure drag visual is cleaned up even if mouse leaves target
+            // Use NoTrickleDown so this fires AFTER specific element handlers
+            _root.RegisterCallback<MouseUpEvent>(evt => OnGlobalMouseUp(evt), TrickleDown.NoTrickleDown);
+        }
+
+        private void OnGlobalMouseUp(MouseUpEvent evt)
+        {
+            // Always cleanup drag visual on any mouse up event in the window
+            // This runs AFTER specific OnStepMouseUp/OnNestedCommandMouseUp handlers
+            CleanupDragVisual();
+            
+            // Reset drag state
+            _draggedStep = null;
+            _draggedFromList = null;
+            _draggedFromGroup = null;
         }
 
         private void UpdateStatusLabel(string message)
         {
             _statusLabel.text = $"{message} [{System.DateTime.Now:HH:mm:ss}]";
+        }
+
+        // ========== Drag-Drop for Pipeline Steps ==========
+        
+        private void OnStepMouseDown(MouseDownEvent evt, BuildCommandStep step, List<BuildCommandStep> stepsList)
+        {
+            if (evt.button == 0) // Left mouse button
+            {
+                _draggedStep = step;
+                _draggedFromList = stepsList;
+                _draggedFromGroup = null;
+                _draggedElementVisual = evt.target as VisualElement;
+                
+                // Create visual clone for dragging
+                if (_draggedElementVisual != null)
+                {
+                    CreateDragVisual(_draggedElementVisual);
+                }
+            }
+        }
+        
+        private void OnStepMouseMove(MouseEventBase<MouseMoveEvent> evt, VisualElement target, BuildCommandStep step, List<BuildCommandStep> stepsList)
+        {
+            // Update drag visual position if dragging
+            if (_draggedStep != null && _draggedElementClone != null)
+            {
+                var mousePos = evt.mousePosition;
+                _draggedElementClone.style.left = mousePos.x - 50; // Offset to center on cursor
+                _draggedElementClone.style.top = mousePos.y - 20;
+            }
+        }
+        
+        private void OnStepMouseEnter(MouseEnterEvent evt, VisualElement target, BuildCommandStep step, List<BuildCommandStep> stepsList)
+        {
+            if (_draggedStep != null && _draggedStep != step)
+            {
+                // Show visual feedback that this is a drop target
+                target.style.backgroundColor = new StyleColor(new Color(0.3f, 0.5f, 0.8f, 0.2f));
+            }
+        }
+        
+        private void OnStepMouseLeave(MouseLeaveEvent evt, VisualElement target, BuildCommandStep step, int stepIndex)
+        {
+            // Restore original background color based on index parity
+            var bgColor = stepIndex % 2 == 0 
+                ? new Color(0.12f, 0.12f, 0.12f) 
+                : new Color(0.16f, 0.16f, 0.16f);
+            target.style.backgroundColor = new StyleColor(bgColor);
+        }
+
+        // ========== Drag-Drop for Nested Commands ==========
+        
+        private void OnNestedCommandMouseDown(MouseDownEvent evt, PipelineCommandsGroup group, BuildCommandStep step)
+        {
+            if (evt.button == 0) // Left mouse button
+            {
+                _draggedStep = step;
+                _draggedFromGroup = group;
+                _draggedFromList = null;
+                _draggedElementVisual = evt.target as VisualElement;
+                
+                // Create visual clone for dragging
+                if (_draggedElementVisual != null)
+                {
+                    CreateDragVisual(_draggedElementVisual);
+                }
+            }
+        }
+        
+        private void OnNestedCommandMouseMove(MouseEventBase<MouseMoveEvent> evt, VisualElement target, PipelineCommandsGroup group, BuildCommandStep step)
+        {
+            // Update drag visual position if dragging
+            if (_draggedStep != null && _draggedElementClone != null)
+            {
+                var mousePos = evt.mousePosition;
+                _draggedElementClone.style.left = mousePos.x - 50; // Offset to center on cursor
+                _draggedElementClone.style.top = mousePos.y - 20;
+            }
+        }
+        
+        private void OnNestedCommandMouseEnter(MouseEnterEvent evt, VisualElement target, PipelineCommandsGroup group, BuildCommandStep step)
+        {
+            if (_draggedStep != null && _draggedStep != step)
+            {
+                target.style.backgroundColor = new StyleColor(new Color(0.3f, 0.5f, 0.8f, 0.2f));
+            }
+        }
+        
+        private void OnNestedCommandMouseLeave(MouseLeaveEvent evt, VisualElement target, PipelineCommandsGroup group, BuildCommandStep step)
+        {
+            // Restore original color (nested commands have default background)
+            target.style.backgroundColor = StyleKeyword.Initial;
+        }
+        
+        private void OnStepMouseUp(MouseUpEvent evt, BuildCommandStep step, List<BuildCommandStep> stepsList, VisualElement target)
+        {
+            if (_draggedStep == null || _draggedStep == step || _draggedFromList == null)
+            {
+                return;
+            }
+
+            // If dragging within same list
+            if (_draggedFromList == stepsList)
+            {
+                int draggedIndex = stepsList.IndexOf(_draggedStep);
+                int targetIndex = stepsList.IndexOf(step);
+
+                if (draggedIndex < 0 || targetIndex < 0 || draggedIndex == targetIndex)
+                {
+                    return;
+                }
+
+                // Swap elements
+                var temp = stepsList[draggedIndex];
+                stepsList[draggedIndex] = stepsList[targetIndex];
+                stepsList[targetIndex] = temp;
+
+                EditorUtility.SetDirty(_selectedPipeline);
+                RefreshPipelineEditor();
+                UpdateStatusLabel($"Step moved from position {draggedIndex + 1} to {targetIndex + 1}");
+            }
+        }
+        
+        private void OnNestedCommandMouseUp(MouseUpEvent evt, PipelineCommandsGroup group, BuildCommandStep step, VisualElement target)
+        {
+            if (_draggedStep == null || _draggedStep == step || _draggedFromGroup == null)
+            {
+                return;
+            }
+
+            // If dragging within same group
+            if (_draggedFromGroup == group && _draggedFromGroup.commands.commands.Contains(_draggedStep))
+            {
+                int draggedIndex = group.commands.commands.IndexOf(_draggedStep);
+                int targetIndex = group.commands.commands.IndexOf(step);
+
+                if (draggedIndex < 0 || targetIndex < 0 || draggedIndex == targetIndex)
+                {
+                    return;
+                }
+
+                // Swap elements
+                var temp = group.commands.commands[draggedIndex];
+                group.commands.commands[draggedIndex] = group.commands.commands[targetIndex];
+                group.commands.commands[targetIndex] = temp;
+
+                EditorUtility.SetDirty(_selectedPipeline);
+                RefreshPipelineEditor();
+                UpdateStatusLabel($"Command moved within group");
+            }
+        }
+
+        // ========== Drag Visual Support ==========
+
+        private void CreateDragVisual(VisualElement sourceElement)
+        {
+            CleanupDragVisual();
+
+            if (sourceElement == null || _root == null)
+                return;
+
+            // Create a clone of the dragged element
+            _draggedElementClone = new VisualElement();
+            _draggedElementClone.style.position = Position.Absolute;
+            _draggedElementClone.style.backgroundColor = new StyleColor(new Color(0.2f, 0.3f, 0.4f, 0.8f));
+            _draggedElementClone.style.borderTopWidth = 2;
+            _draggedElementClone.style.borderTopColor = new StyleColor(new Color(0.4f, 0.6f, 0.9f));
+            _draggedElementClone.style.borderBottomWidth = 2;
+            _draggedElementClone.style.borderBottomColor = new StyleColor(new Color(0.4f, 0.6f, 0.9f));
+            _draggedElementClone.style.paddingLeft = 8;
+            _draggedElementClone.style.paddingRight = 8;
+            _draggedElementClone.style.paddingTop = 4;
+            _draggedElementClone.style.paddingBottom = 4;
+            _draggedElementClone.style.width = sourceElement.worldBound.width;
+            _draggedElementClone.style.height = sourceElement.worldBound.height;
+            _draggedElementClone.style.left = sourceElement.worldBound.x;
+            _draggedElementClone.style.top = sourceElement.worldBound.y;
+            
+            // Add a label to show what's being dragged
+            var dragLabel = new Label("Перетаскивание...");
+            dragLabel.style.fontSize = 11;
+            dragLabel.style.color = new StyleColor(Color.white);
+            dragLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            _draggedElementClone.Add(dragLabel);
+
+            _root.Add(_draggedElementClone);
+        }
+
+        private void CleanupDragVisual()
+        {
+            if (_draggedElementClone != null && _draggedElementClone.parent != null)
+            {
+                _draggedElementClone.RemoveFromHierarchy();
+            }
+            _draggedElementClone = null;
+        }
+
+        // ========== Helper Classes for Drag-Drop ==========
+
+        private struct StepDragData
+        {
+            public BuildCommandStep step;
+            public List<BuildCommandStep> stepsList;
+            public StyleColor originalBgColor;
+        }
+
+        private struct NestedCommandDragData
+        {
+            public PipelineCommandsGroup group;
+            public BuildCommandStep step;
+            public StyleColor originalBgColor;
         }
 
         private void OnDestroy()
