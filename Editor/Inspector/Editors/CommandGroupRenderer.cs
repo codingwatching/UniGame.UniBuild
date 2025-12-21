@@ -124,6 +124,39 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             rightSection.style.flexDirection = FlexDirection.Row;
             rightSection.style.alignItems = Align.Center;
 
+            // Add reorder buttons for the command group itself
+            var moveUpBtn = UIElementFactory.CreateButton("↑", () => 
+            {
+                // Move group up in the parent step
+                var parentStep = _step;
+                var groupIndex = parentStep.GetCommands().ToList().IndexOf(_group);
+                if (groupIndex > 0)
+                {
+                    var commands = parentStep.GetCommands().ToList();
+                    var temp = commands[groupIndex];
+                    commands[groupIndex] = commands[groupIndex - 1];
+                    commands[groupIndex - 1] = temp;
+                    EditorUtility.SetDirty(_selectedPipeline);
+                }
+            }, UIThemeConstants.Sizes.ButtonSmall);
+            rightSection.Add(moveUpBtn);
+
+            var moveDownBtn = UIElementFactory.CreateButton("↓", () => 
+            {
+                // Move group down in the parent step
+                var parentStep = _step;
+                var commands = parentStep.GetCommands().ToList();
+                var groupIndex = commands.IndexOf(_group);
+                if (groupIndex < commands.Count - 1)
+                {
+                    var temp = commands[groupIndex];
+                    commands[groupIndex] = commands[groupIndex + 1];
+                    commands[groupIndex + 1] = temp;
+                    EditorUtility.SetDirty(_selectedPipeline);
+                }
+            }, UIThemeConstants.Sizes.ButtonSmall);
+            rightSection.Add(moveDownBtn);
+
             var groupRunBtn = UIElementFactory.CreateButton("Run", () => { /* Execute group */ }, UIThemeConstants.Sizes.ButtonMedium);
             rightSection.Add(groupRunBtn);
 

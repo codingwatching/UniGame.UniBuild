@@ -12,16 +12,20 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
     /// </summary>
     public class DragDropManager
     {
+        private const float DRAG_THRESHOLD = 5f; // Minimum pixels to move before starting drag
+        
         private BuildCommandStep _draggedStep;
         private List<BuildCommandStep> _draggedFromList;
         private PipelineCommandsGroup _draggedFromGroup;
         private VisualElement _draggedElementClone;
         private VisualElement _root;
+        private Vector2 _dragStartPosition;
+        private bool _isDragInProgress; // Track if actual drag has started (after threshold)
 
         public event Action<BuildCommandStep, List<BuildCommandStep>, List<BuildCommandStep>> OnStepSwapped;
         public event Action<BuildCommandStep, PipelineCommandsGroup, BuildCommandStep, BuildCommandStep> OnNestedCommandSwapped;
 
-        public bool IsDragging => _draggedStep != null;
+        public bool IsDragging => _isDragInProgress;
         public BuildCommandStep DraggedStep => _draggedStep;
 
         public DragDropManager(VisualElement rootElement)
@@ -48,8 +52,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _draggedStep = step;
             _draggedFromList = stepsList;
             _draggedFromGroup = null;
-            
-            CreateDragVisual(sourceElement);
+            _isDragInProgress = false; // Don't start drag yet, wait for mouse move threshold
+            _dragStartPosition = Vector2.zero;
         }
 
         /// <summary>
@@ -62,8 +66,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _draggedStep = step;
             _draggedFromGroup = group;
             _draggedFromList = null;
-            
-            CreateDragVisual(sourceElement);
+            _isDragInProgress = false; // Don't start drag yet, wait for mouse move threshold
+            _dragStartPosition = Vector2.zero;
         }
 
         /// <summary>
@@ -71,7 +75,28 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         /// </summary>
         public void UpdateDragVisualPosition(Vector2 mousePosition)
         {
-            if (_draggedElementClone != null)
+            // Check if we've moved enough to start the actual drag
+            if (_draggedStep != null && !_isDragInProgress)
+            {
+                if (_dragStartPosition == Vector2.zero)
+                {
+                    _dragStartPosition = mousePosition;
+                    return; // Wait for next move event
+                }
+
+                float distance = Vector2.Distance(mousePosition, _dragStartPosition);
+                if (distance >= DRAG_THRESHOLD)
+                {
+                    _isDragInProgress = true;
+                    CreateDragVisual(null); // Create drag visual once threshold is exceeded
+                }
+                else
+                {
+                    return; // Not enough movement yet
+                }
+            }
+
+            if (_isDragInProgress && _draggedElementClone != null)
             {
                 _draggedElementClone.style.left = mousePosition.x - 50;
                 _draggedElementClone.style.top = mousePosition.y - 20;
@@ -84,6 +109,9 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         public bool TrySwapSteps(BuildCommandStep targetStep, List<BuildCommandStep> targetList)
         {
             if (_draggedStep == null || _draggedStep == targetStep || _draggedFromList == null)
+                return false;
+
+            if (!_isDragInProgress) // Only swap if actual drag happened
                 return false;
 
             if (_draggedFromList != targetList)
@@ -110,6 +138,9 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         public bool TrySwapNestedCommands(BuildCommandStep targetStep, PipelineCommandsGroup targetGroup)
         {
             if (_draggedStep == null || _draggedStep == targetStep || _draggedFromGroup == null)
+                return false;
+
+            if (!_isDragInProgress) // Only swap if actual drag happened
                 return false;
 
             if (_draggedFromGroup != targetGroup)
@@ -139,10 +170,27 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         {
             CleanupDragVisual();
 
-            if (sourceElement == null || _root == null)
+            if (_root == null)
                 return;
 
-            _draggedElementClone = UIElementFactory.CreateDragVisualClone(sourceElement);
+            // Create a simple visual representation
+            _draggedElementClone = new VisualElement();
+            _draggedElementClone.style.position = Position.Absolute;
+            _draggedElementClone.style.width = 200;
+            _draggedElementClone.style.height = 40;
+            _draggedElementClone.style.backgroundColor = new StyleColor(new Color(0.3f, 0.6f, 0.9f, 0.5f));
+            _draggedElementClone.style.borderTopWidth = 2;
+            _draggedElementClone.style.borderTopColor = new StyleColor(new Color(0.5f, 0.8f, 1f));
+            _draggedElementClone.style.borderBottomWidth = 2;
+            _draggedElementClone.style.borderBottomColor = new StyleColor(new Color(0.5f, 0.8f, 1f));
+            _draggedElementClone.style.justifyContent = Justify.Center;
+            _draggedElementClone.style.alignItems = Align.Center;
+            
+            var dragLabel = new Label("Dragging step...");
+            dragLabel.style.color = new StyleColor(new Color(1f, 1f, 1f));
+            dragLabel.style.fontSize = 12;
+            _draggedElementClone.Add(dragLabel);
+            
             _root.Add(_draggedElementClone);
         }
 
@@ -167,6 +215,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _draggedStep = null;
             _draggedFromList = null;
             _draggedFromGroup = null;
+            _isDragInProgress = false;
+            _dragStartPosition = Vector2.zero;
         }
     }
 }

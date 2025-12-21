@@ -5,6 +5,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using Commands;
+    using Inspector;
     using Google.Apis.Sheets.v4.Data;
     using UniModules.UniGame.UniBuild;
     using UnityEditor;
@@ -360,19 +362,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
 
         private void CollectCommandMetadata()
         {
-            _commandMetadata = new Dictionary<Type, BuildCommandMetadataAttribute>();
-
-            var commandTypes = TypeCache.GetTypesDerivedFrom<SerializableBuildCommand>();
-            foreach (var type in commandTypes)
-            {
-                if (type.IsAbstract) continue;
-
-                var metadata = type.GetCustomAttribute<BuildCommandMetadataAttribute>();
-                if (metadata != null)
-                {
-                    _commandMetadata[type] = metadata;
-                }
-            }
+            _commandMetadata = CommandDiscovery.GetAllCommandsWithMetadata();
         }
 
         private void PopulateCommandCatalog()
@@ -541,9 +531,23 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             infoBox.style.borderBottomColor = new StyleColor(borderColor);
             infoBox.style.borderLeftColor = new StyleColor(borderColor);
 
-            infoBox.Add(new Label($"Pipeline: {_selectedPipeline.name}"));
-            infoBox.Add(new Label($"Total Steps: {_selectedPipeline.preBuildCommands.Count + _selectedPipeline.postBuildCommands.Count}"));
+            var infoRow = new VisualElement();
+            infoRow.style.flexDirection = FlexDirection.Row;
+            infoRow.style.justifyContent = Justify.SpaceBetween;
+            infoRow.style.alignItems = Align.Center;
+            infoRow.style.marginBottom = 8;
 
+            var infoColumn = new VisualElement();
+            infoColumn.style.flexDirection = FlexDirection.Column;
+            infoColumn.style.flexGrow = 1;
+            infoColumn.Add(new Label($"Pipeline: {_selectedPipeline.name}"));
+            infoColumn.Add(new Label($"Total Steps: {_selectedPipeline.preBuildCommands.Count + _selectedPipeline.postBuildCommands.Count}"));
+            infoRow.Add(infoColumn);
+
+            var addStepBtn = UIElementFactory.CreateButton("+ Add Step", () => ShowAddStepDialog(), UIThemeConstants.Sizes.ButtonLarge);
+            infoRow.Add(addStepBtn);
+
+            infoBox.Add(infoRow);
             _pipelineEditorContainer.Add(infoBox);
 
             // Steps list
@@ -553,21 +557,42 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 return;
             }
 
-            // Pre-build commands
-            int stepIndex = 0;
-            foreach (var command in _selectedPipeline.preBuildCommands)
+            // Pre-build commands section
+            if (_selectedPipeline.preBuildCommands.Count > 0)
             {
-                var stepItem = CreatePipelineStepItem(command, stepIndex, _selectedPipeline.preBuildCommands, true);
-                _pipelineEditorContainer.Add(stepItem);
-                stepIndex++;
+                var preBuildSection = CreateStepGroupSection("Pre-Build Commands", new Color(0.3f, 0.5f, 0.7f, 0.2f));
+                _pipelineEditorContainer.Add(preBuildSection);
+
+                int stepIndex = 0;
+                foreach (var command in _selectedPipeline.preBuildCommands)
+                {
+                    var stepItem = CreatePipelineStepItem(command, stepIndex, _selectedPipeline.preBuildCommands, true);
+                    _pipelineEditorContainer.Add(stepItem);
+                    stepIndex++;
+                }
+
+                // Add separator after pre-build section
+                var separator = new VisualElement();
+                separator.style.height = 2;
+                separator.style.marginTop = 8;
+                separator.style.marginBottom = 8;
+                separator.style.backgroundColor = new StyleColor(new Color(0.3f, 0.3f, 0.3f));
+                _pipelineEditorContainer.Add(separator);
             }
 
-            // Post-build commands
-            foreach (var command in _selectedPipeline.postBuildCommands)
+            // Post-build commands section
+            if (_selectedPipeline.postBuildCommands.Count > 0)
             {
-                var stepItem = CreatePipelineStepItem(command, stepIndex, _selectedPipeline.postBuildCommands, false);
-                _pipelineEditorContainer.Add(stepItem);
-                stepIndex++;
+                var postBuildSection = CreateStepGroupSection("Post-Build Commands", new Color(0.7f, 0.5f, 0.3f, 0.2f));
+                _pipelineEditorContainer.Add(postBuildSection);
+
+                int stepIndex = _selectedPipeline.preBuildCommands.Count;
+                foreach (var command in _selectedPipeline.postBuildCommands)
+                {
+                    var stepItem = CreatePipelineStepItem(command, stepIndex, _selectedPipeline.postBuildCommands, false);
+                    _pipelineEditorContainer.Add(stepItem);
+                    stepIndex++;
+                }
             }
         }
 
@@ -581,6 +606,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             renderer.OnMoveDown += MoveStepDown;
             renderer.OnRemove += RemoveStep;
             renderer.OnExecute += ExecuteStep;
+            renderer.OnAddCommand += ShowAddCommandDialog;
             
             renderer.OnStepMouseDown += (evt, s, list) => OnStepMouseDown(evt, s, list);
             renderer.OnStepMouseMove += (evt, target, s, list) => OnStepMouseMove(evt, target, s, list);
@@ -592,6 +618,31 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             PropertyEditorFactory.SetPipelineReference(_selectedPipeline);
             
             return renderer.Render();
+        }
+
+        private VisualElement CreateStepGroupSection(string title, Color backgroundColor)
+        {
+            var section = new VisualElement();
+            section.style.marginTop = 12;
+            section.style.marginBottom = 8;
+            section.style.paddingLeft = 8;
+            section.style.paddingRight = 8;
+            section.style.paddingTop = 6;
+            section.style.paddingBottom = 6;
+            section.style.backgroundColor = new StyleColor(backgroundColor);
+            section.style.borderLeftWidth = 4;
+            section.style.borderLeftColor = new StyleColor(new Color(0.5f, 0.5f, 0.5f));
+
+            var label = new Label(title);
+            label.style.fontSize = UIThemeConstants.FontSizes.Medium;
+            label.style.unityFontStyleAndWeight = FontStyle.Bold;
+            label.style.color = new StyleColor(new Color(1f, 1f, 1f, 0.9f));
+            label.style.marginLeft = 0;
+            label.style.marginTop = 0;
+            label.style.marginBottom = 0;
+
+            section.Add(label);
+            return section;
         }
         
         private VisualElement CreatePipelineStepItemOld(BuildCommandStep step, int stepIndex, List<BuildCommandStep> stepsList, bool isPreBuild)
@@ -1590,6 +1641,103 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             EditorUtility.SetDirty(_selectedPipeline);
             RefreshPipelineEditor();
             UpdateStatusLabel("Step removed");
+        }
+
+        private void ShowAddStepDialog()
+        {
+            CommandSelectionWindow.ShowWindow((commandType) =>
+            {
+                AddNewStep(commandType);
+            });
+        }
+
+        private void AddNewStep(Type commandType)
+        {
+            if (_selectedPipeline == null || commandType == null) return;
+
+            try
+            {
+                // Create instance of the command type
+                var commandInstance = Activator.CreateInstance(commandType) as IUnityBuildCommand;
+                if (commandInstance == null)
+                {
+                    Debug.LogError($"Failed to create instance of {commandType.Name}");
+                    return;
+                }
+
+                // Create a new BuildCommandStep with this command
+                var newStep = new BuildCommandStep();
+                
+                // Check if it's a serializable command
+                if (commandInstance is SerializableBuildCommand serializableCmd)
+                {
+                    newStep.serializableCommand = serializableCmd;
+                }
+                else if (commandInstance is UnityBuildCommand unityCmd)
+                {
+                    // For UnityBuildCommand, we need to handle it differently
+                    Debug.LogWarning($"UnityBuildCommand {commandType.Name} requires asset reference, cannot create directly");
+                    return;
+                }
+
+                // Add to preBuildCommands by default
+                _selectedPipeline.preBuildCommands.Add(newStep);
+                EditorUtility.SetDirty(_selectedPipeline);
+                RefreshPipelineEditor();
+                UpdateStatusLabel($"Step added: {commandType.Name}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to add step: {ex.Message}");
+            }
+        }
+
+        private void ShowAddCommandDialog(PipelineCommandsGroup group)
+        {
+            CommandSelectionWindow.ShowWindow((commandType) =>
+            {
+                AddCommandToGroup(group, commandType);
+            });
+        }
+
+        private void AddCommandToGroup(PipelineCommandsGroup group, Type commandType)
+        {
+            if (group == null || group.commands == null || commandType == null) return;
+
+            try
+            {
+                // Create instance of the command type
+                var commandInstance = Activator.CreateInstance(commandType) as IUnityBuildCommand;
+                if (commandInstance == null)
+                {
+                    Debug.LogError($"Failed to create instance of {commandType.Name}");
+                    return;
+                }
+
+                // Create a new BuildCommandStep with this command
+                var newStep = new BuildCommandStep();
+                
+                // Check if it's a serializable command
+                if (commandInstance is SerializableBuildCommand serializableCmd)
+                {
+                    newStep.serializableCommand = serializableCmd;
+                }
+                else if (commandInstance is UnityBuildCommand unityCmd)
+                {
+                    Debug.LogWarning($"UnityBuildCommand {commandType.Name} requires asset reference, cannot add to group");
+                    return;
+                }
+
+                // Add to group's commands list
+                group.commands.commands.Add(newStep);
+                EditorUtility.SetDirty(_selectedPipeline);
+                RefreshPipelineEditor();
+                UpdateStatusLabel($"Command added to group: {commandType.Name}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to add command: {ex.Message}");
+            }
         }
 
         private void AddCommandToGroup(PipelineCommandsGroup group)

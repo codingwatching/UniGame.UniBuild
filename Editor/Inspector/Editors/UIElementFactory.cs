@@ -104,6 +104,10 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             if (width > 0)
                 button.style.width = width;
             button.style.marginRight = UIThemeConstants.Spacing.Margin;
+            
+            // Prevent drag-drop from starting when clicking buttons
+            button.RegisterCallback<MouseDownEvent>(evt => evt.StopPropagation());
+            
             return button;
         }
 
