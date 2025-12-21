@@ -51,8 +51,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
 
         // Data
         private BuildPipelineInspectorSettings _settings;
-        private List<ScriptableCommandsGroup> _loadedPipelines = new List<ScriptableCommandsGroup>();
-        private ScriptableCommandsGroup _selectedPipeline;
+        private List<UniBuildPipeline> _loadedPipelines = new List<UniBuildPipeline>();
+        private UniBuildPipeline _selectedPipeline;
         private Dictionary<Type, BuildCommandMetadataAttribute> _commandMetadata;
         private List<PipelineExecutionState> _executionHistory = new List<PipelineExecutionState>();
 
@@ -112,10 +112,25 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var header = CreateHeader();
             _root.Add(header);
 
-            // Main tab view
+            // Main container with tabs
             _mainTabs = new CustomTabView();
-            CreatePipelineListTab();
-            CreatePipelineEditorTab();
+
+            // First tab: Pipelines with split view (list + editor)
+            var pipelinesTab = new CustomTabView.Tab() { label = "Pipelines", content = new VisualElement() };
+            pipelinesTab.content.style.flexDirection = FlexDirection.Row;
+            pipelinesTab.content.style.flexGrow = 1;
+
+            // Left panel: Pipeline list
+            var leftPanel = CreatePipelineListPanel();
+            pipelinesTab.content.Add(leftPanel);
+
+            // Right panel: Pipeline editor
+            var rightPanel = CreatePipelineEditorPanel();
+            pipelinesTab.content.Add(rightPanel);
+
+            _mainTabs.Add(pipelinesTab);
+
+            // Other tabs
             CreateCommandCatalogTab();
             CreateSettingsTab();
 
@@ -150,23 +165,27 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             return header;
         }
 
-        private void CreatePipelineListTab()
+        private VisualElement CreatePipelineListPanel()
         {
-            var tab = new CustomTabView.Tab() { label = "Pipelines", content = new VisualElement() };
-            tab.content.style.flexDirection = FlexDirection.Column;
-            tab.content.style.flexGrow = 1;
+            var panel = new VisualElement();
+            panel.style.flexDirection = FlexDirection.Column;
+            panel.style.width = 300;
+            panel.style.borderRightWidth = 1;
+            panel.style.borderRightColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f));
 
             // Search and create controls
             var topControls = new VisualElement();
-            topControls.style.flexDirection = FlexDirection.Row;
+            topControls.style.flexDirection = FlexDirection.Column;
             topControls.style.paddingLeft = 8;
             topControls.style.paddingRight = 8;
             topControls.style.paddingTop = 8;
             topControls.style.paddingBottom = 8;
+            topControls.style.borderBottomWidth = 1;
+            topControls.style.borderBottomColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f));
 
             _pipelineSearchField = new TextField();
             _pipelineSearchField.value = "";
-            _pipelineSearchField.style.flexGrow = 1;
+            _pipelineSearchField.style.marginBottom = 4;
             _pipelineSearchField.RegisterValueChangedCallback(evt => FilterPipelines(evt.newValue));
             topControls.Add(_pipelineSearchField);
 
@@ -174,7 +193,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _createPipelineButton.AddToClassList("button-create");
             topControls.Add(_createPipelineButton);
 
-            tab.content.Add(topControls);
+            panel.Add(topControls);
 
             // Pipeline list scroll view
             _pipelineScrollView = new ScrollView();
@@ -182,16 +201,16 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _pipelineListContainer = new VisualElement();
             _pipelineListContainer.style.flexDirection = FlexDirection.Column;
             _pipelineScrollView.Add(_pipelineListContainer);
-            tab.content.Add(_pipelineScrollView);
+            panel.Add(_pipelineScrollView);
 
-            _mainTabs.Add(tab);
+            return panel;
         }
 
-        private void CreatePipelineEditorTab()
+        private VisualElement CreatePipelineEditorPanel()
         {
-            var tab = new CustomTabView.Tab() { label = "Editor", content = new VisualElement() };
-            tab.content.style.flexDirection = FlexDirection.Column;
-            tab.content.style.flexGrow = 1;
+            var panel = new VisualElement();
+            panel.style.flexDirection = FlexDirection.Column;
+            panel.style.flexGrow = 1;
 
             // Editor header
             var editorHeader = new VisualElement();
@@ -200,6 +219,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             editorHeader.style.paddingRight = 8;
             editorHeader.style.paddingTop = 8;
             editorHeader.style.paddingBottom = 8;
+            editorHeader.style.borderBottomWidth = 1;
+            editorHeader.style.borderBottomColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f));
 
             var selectedLabel = new Label("Selected: ");
             editorHeader.Add(selectedLabel);
@@ -213,7 +234,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _executePipelineButton.AddToClassList("button-execute");
             editorHeader.Add(_executePipelineButton);
 
-            tab.content.Add(editorHeader);
+            panel.Add(editorHeader);
 
             // Step search
             _stepSearchField = new TextField();
@@ -223,14 +244,14 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _stepSearchField.style.marginTop = 8;
             _stepSearchField.style.marginBottom = 8;
             _stepSearchField.RegisterValueChangedCallback(evt => FilterPipelineSteps(evt.newValue));
-            tab.content.Add(_stepSearchField);
+            panel.Add(_stepSearchField);
 
             // Editor container
             _pipelineEditorContainer = new ScrollView();
             _pipelineEditorContainer.style.flexGrow = 1;
-            tab.content.Add(_pipelineEditorContainer);
+            panel.Add(_pipelineEditorContainer);
 
-            _mainTabs.Add(tab);
+            return panel;
         }
 
         private void CreateCommandCatalogTab()
@@ -401,11 +422,11 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         {
             _loadedPipelines.Clear();
 
-            var guids = AssetDatabase.FindAssets("t:ScriptableCommandsGroup");
+            var guids = AssetDatabase.FindAssets("t:UniBuildPipeline");
             foreach (var guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
-                var pipeline = AssetDatabase.LoadAssetAtPath<ScriptableCommandsGroup>(path);
+                var pipeline = AssetDatabase.LoadAssetAtPath<UniBuildPipeline>(path);
                 if (pipeline != null)
                 {
                     _loadedPipelines.Add(pipeline);
@@ -432,7 +453,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             }
         }
 
-        private VisualElement CreatePipelineListItem(ScriptableCommandsGroup pipeline)
+        private VisualElement CreatePipelineListItem(UniBuildPipeline pipeline)
         {
             var item = new Button(() => SelectPipeline(pipeline));
             item.AddToClassList("pipeline-list-item");
@@ -446,11 +467,17 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             item.style.marginBottom = 4;
             item.style.flexDirection = FlexDirection.Column;
 
-            var name = new Label(pipeline.name);
+            // Get asset file name from the asset path
+            var assetPath = AssetDatabase.GetAssetPath(pipeline);
+            var assetName = Path.GetFileNameWithoutExtension(assetPath);
+            if (string.IsNullOrEmpty(assetName))
+                assetName = pipeline.name;
+
+            var name = new Label(assetName);
             name.AddToClassList("pipeline-name");
             item.Add(name);
 
-            var info = new Label($"Steps: {pipeline.commands.commands.Count}");
+            var info = new Label($"Steps: {pipeline.preBuildCommands.Count + pipeline.postBuildCommands.Count}");
             info.style.fontSize = 11;
             info.style.color = new StyleColor(new Color(0.7f, 0.7f, 0.7f));
             item.Add(info);
@@ -458,7 +485,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             return item;
         }
 
-        private void SelectPipeline(ScriptableCommandsGroup pipeline)
+        private void SelectPipeline(UniBuildPipeline pipeline)
         {
             _selectedPipeline = pipeline;
             RefreshPipelineEditor();
@@ -493,18 +520,26 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             infoBox.style.borderLeftColor = new StyleColor(borderColor);
 
             infoBox.Add(new Label($"Pipeline: {_selectedPipeline.name}"));
-            infoBox.Add(new Label($"Total Steps: {_selectedPipeline.commands.commands.Count}"));
+            infoBox.Add(new Label($"Total Steps: {_selectedPipeline.preBuildCommands.Count + _selectedPipeline.postBuildCommands.Count}"));
 
             _pipelineEditorContainer.Add(infoBox);
 
             // Steps list
-            if (_selectedPipeline.commands.commands.Count == 0)
+            if (_selectedPipeline.preBuildCommands.Count == 0 && _selectedPipeline.postBuildCommands.Count == 0)
             {
                 _pipelineEditorContainer.Add(new Label("No steps added"));
                 return;
             }
 
-            foreach (var command in _selectedPipeline.commands.commands)
+            // Pre-build commands
+            foreach (var command in _selectedPipeline.preBuildCommands)
+            {
+                var stepItem = CreatePipelineStepItem(command);
+                _pipelineEditorContainer.Add(stepItem);
+            }
+
+            // Post-build commands
+            foreach (var command in _selectedPipeline.postBuildCommands)
             {
                 var stepItem = CreatePipelineStepItem(command);
                 _pipelineEditorContainer.Add(stepItem);
@@ -594,7 +629,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         {
             if (_selectedPipeline == null) return;
 
-            _selectedPipeline.commands.commands.Remove(step);
+            _selectedPipeline.preBuildCommands.Remove(step);
+            _selectedPipeline.postBuildCommands.Remove(step);
             EditorUtility.SetDirty(_selectedPipeline);
             RefreshPipelineEditor();
             UpdateStatusLabel("Step removed");
@@ -615,28 +651,47 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 var startTime = EditorApplication.timeSinceStartup;
                 var executionState = new PipelineExecutionState(_selectedPipeline.name);
 
-                var config = new EditorBuildConfiguration(null, null);
+            var config = new EditorBuildConfiguration(null, null);
 
-                foreach (var step in _selectedPipeline.commands.commands)
+            // Execute pre-build commands
+            foreach (var step in _selectedPipeline.preBuildCommands)
+            {
+                foreach (var command in step.GetCommands())
                 {
-                    foreach (var command in step.GetCommands())
-                    {
-                        if (!command.IsActive) continue;
+                    if (!command.IsActive) continue;
 
-                        try
-                        {
-                            command.Execute(config);
-                            executionState.AddStepExecution(command.Name, true);
-                        }
-                        catch (Exception ex)
-                        {
-                            executionState.AddStepExecution(command.Name, false, ex.Message);
-                            throw;
-                        }
+                    try
+                    {
+                        command.Execute(config);
+                        executionState.AddStepExecution(command.Name, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        executionState.AddStepExecution(command.Name, false, ex.Message);
+                        throw;
                     }
                 }
+            }
 
-                var executionTime = (float)(EditorApplication.timeSinceStartup - startTime);
+            // Execute post-build commands
+            foreach (var step in _selectedPipeline.postBuildCommands)
+            {
+                foreach (var command in step.GetCommands())
+                {
+                    if (!command.IsActive) continue;
+
+                    try
+                    {
+                        command.Execute(config);
+                        executionState.AddStepExecution(command.Name, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        executionState.AddStepExecution(command.Name, false, ex.Message);
+                        throw;
+                    }
+                }
+            }                var executionTime = (float)(EditorApplication.timeSinceStartup - startTime);
                 executionState.SetExecutionTime(executionTime);
                 executionState.SetResult(true);
 
