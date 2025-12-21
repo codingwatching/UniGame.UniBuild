@@ -2,92 +2,100 @@
 
 Command-based scriptable build pipeline for Unity Engine
 
+![Build Pipeline Editor](https://i.ibb.co/bgWQMYdB/build-pipeline4.png)
+
 - [UniGame.UniBuild](#unigameunibuild)
+  - [Quick Start](#quick-start)
+    - [Opening Build Pipeline Editor](#opening-build-pipeline-editor)
+    - [Creating Your First Pipeline](#creating-your-first-pipeline)
+    - [Basic Usage](#basic-usage)
   - [Overview](#overview)
   - [Installation](#installation)
     - [Dependencies](#dependencies)
     - [Package Installation](#package-installation)
-  - [Getting Started](#getting-started)
-    - [Creating Build Configuration](#creating-build-configuration)
-    - [Basic Usage](#basic-usage)
+    - [Unity Build Profiles Support](#unity-build-profiles-support)
   - [Core Architecture](#core-architecture)
     - [Build System Components](#build-system-components)
     - [Build Pipeline Flow](#build-pipeline-flow)
-    - [Configuration System](#configuration-system)
-  - [Build Configuration](#build-configuration)
-    - [Build Settings](#build-settings)
-    - [Platform Configuration](#platform-configuration)
-    - [Build Options](#build-options)
-    - [WebGL Settings](#webgl-settings)
   - [Command System](#command-system)
     - [Command Types](#command-types)
     - [Creating Commands](#creating-commands)
-      - [Serializable Command](#serializable-command)
+      - [Simple Serializable Command](#simple-serializable-command)
       - [ScriptableObject Command](#scriptableobject-command)
     - [Built-in Commands](#built-in-commands)
-      - [Platform Commands](#platform-commands)
-      - [Build Configuration Commands](#build-configuration-commands)
-      - [Utility Commands](#utility-commands)
-      - [Asset Commands](#asset-commands)
-    - [Command Execution](#command-execution)
+    - [Adding Command Metadata](#adding-command-metadata)
   - [Build Pipeline](#build-pipeline)
-    - [Pre-Build Commands](#pre-build-commands)
-    - [Build Process](#build-process)
-    - [Post-Build Commands](#post-build-commands)
-    - [Build Validation](#build-validation)
-  - [Console Arguments](#console-arguments)
-    - [Built-in Arguments](#built-in-arguments)
-      - [Build Configuration](#build-configuration-1)
-      - [Platform Settings](#platform-settings)
-      - [Development Options](#development-options)
-      - [WebGL Options](#webgl-options)
-    - [Custom Arguments](#custom-arguments)
-    - [Arguments API](#arguments-api)
-  - [Build Reporting](#build-reporting)
-    - [Build Reports](#build-reports)
-    - [Build Logger](#build-logger)
-    - [Report Generation](#report-generation)
-  - [Unity Cloud Build](#unity-cloud-build)
-    - [Cloud Build Integration](#cloud-build-integration)
-    - [Auto-Generated Methods](#auto-generated-methods)
-  - [Advanced Features](#advanced-features)
-    - [Build Validation](#build-validation-1)
+    - [Pipeline Execution](#pipeline-execution)
     - [Command Groups](#command-groups)
-    - [Build Environment Types](#build-environment-types)
-    - [Editor Integration](#editor-integration)
+  - [Console Arguments](#console-arguments)
   - [Examples](#examples)
-    - [Basic Build Configuration](#basic-build-configuration)
-    - [Custom Commands](#custom-commands)
-    - [CI/CD Integration](#cicd-integration)
+    - [Example 1: Custom Setup Command](#example-1-custom-setup-command)
   - [Best Practices](#best-practices)
-  - [Troubleshooting](#troubleshooting)
-    - [Common Issues](#common-issues)
-    - [Debug Tips](#debug-tips)
+
+## Quick Start
+
+### Opening Build Pipeline Editor
+
+1. Open Unity Editor
+2. Go to menu: **Tools → Build Pipeline → Pipeline Editor**
+3. The Build Pipeline Editor window will open
+
+### Creating Your First Pipeline
+
+1. In Project window, right-click and select: **Create → UniBuild → UniBuild Pipeline**
+2. Name it (e.g., "AndroidBuild")
+3. Open the Build Pipeline Editor (**Tools → Build Pipeline → Pipeline Editor**)
+4. Select your new configuration from the pipeline list (left panel)
+5. Click **+ Add Step** to start adding commands
+6. Choose from available commands:
+   - For Android: ApplyAndroidSettingsCommand, SwitchActiveBuildTargetCommand
+   - For General: ApplyBuildArgumentsCommand, BuildOptionsCommand
+   - For Post-Build: Copy files, upload artifacts, etc.
+
+### Basic Usage
+
+1. **Configure Build Target**
+   - Select the platform (Android, iOS, WebGL, etc.)
+   - Configure platform-specific settings
+   - (Optional) Use Unity Build Profiles for predefined platform configurations
+
+2. **Add Pre-Build Commands**
+   - Set up build environment
+   - Apply build arguments and settings
+   - Configure platform-specific options
+
+3. **Execute Pipeline**
+   - In Pipeline Editor, click "Run" button or use menu: **Build → Run Build Configuration**
+   - Monitor progress in Console window
+   - Pipeline respects active Build Profile settings
+
+4. **Add Post-Build Commands**
+   - Copy artifacts to specific locations
+   - Trigger deployment processes
+   - Generate reports
 
 ## Overview
 
 UniGame.UniBuild is a comprehensive build automation system for Unity that provides:
 
 - **Command-Based Architecture**: Modular build steps using command pattern
-- **Scriptable Build Pipeline**: Visual configuration with ScriptableObjects
+- **Visual Pipeline Editor**: Drag-drop UI for configuring build steps
 - **Multi-Platform Support**: Unified build system for all Unity platforms
+- **Unity Build Profiles Support**: Full integration with Unity 6 Build Profiles system
 - **Console Integration**: Full command-line interface for CI/CD systems
-- **Unity Cloud Build**: Automatic integration with Unity Cloud Build
 - **Extensible Commands**: Rich set of built-in commands and easy custom command creation
-- **Build Reporting**: Comprehensive build reports and logging
-- **Visual Editor**: Inspector-based configuration with Odin/Tri-Inspector support
 
 ## Installation
 
 ### Dependencies
 
-**Odin Inspector or Tri-Inspector recommended for usage with this Package:**
-- [Odin Inspector](https://odininspector.com)
-- [Tri-Inspector](https://github.com/codewriter-packages/Tri-Inspector)
+**Optional for enhanced Inspector:**
+- [Odin Inspector](https://odininspector.com) - Advanced inspector features
+- [Tri-Inspector](https://github.com/codewriter-packages/Tri-Inspector) - Lightweight alternative
 
 ### Package Installation
 
-Add to your project manifest by path `[%UnityProject%]/Packages/manifest.json`:
+Add to your project manifest (`Packages/manifest.json`):
 
 ```json
 {
@@ -99,658 +107,237 @@ Add to your project manifest by path `[%UnityProject%]/Packages/manifest.json`:
 }
 ```
 
-## Getting Started
+### Unity Build Profiles Support
 
-### Creating Build Configuration
+UniGame.UniBuild fully supports **Unity 6 Build Profiles** system:
 
-Create a new build configuration asset:
+- **Profile Integration**: Each Build Profile can have its own pipeline configuration
+- **Automatic Activation**: Build Profiles are automatically activated when executing pipelines
+- **Profile-Specific Commands**: Configure different commands for different profiles
+- **Consistent Naming**: Pipeline configurations follow Build Profile naming conventions
+- **Seamless Workflow**: Works alongside Unity's native Build Profile system without conflicts
 
-![Build Configuration](https://github.com/UnioGame/UniGame.UniBuild/blob/master/GitAssets/unibuild6.png)
+**To use with Build Profiles:**
 
-![Build Settings](https://github.com/UnioGame/UniGame.UniBuild/blob/master/GitAssets/unibuild7.png)
-
-### Basic Usage
-
-1. **Create Build Configuration**: Right-click in Project window → Create → UniBuild → UniBuildConfiguration
-2. **Configure Settings**: Set build target, options, and commands
-3. **Add Commands**: Configure pre-build and post-build commands
-4. **Execute Build**: Use the build buttons or menu items
+1. Create or select a Build Profile in Unity Editor (Window → Build Profile)
+2. Create a pipeline configuration that matches your profile strategy
+3. Configure commands to work with the active Build Profile
+4. When running the pipeline, it automatically respects the current profile settings
 
 ## Core Architecture
 
 ### Build System Components
 
-The build system consists of several key components:
+The build system consists of key components:
 
 ```csharp
-
-// Build configuration interface
-public interface IUniBuildCommandsMap : IUnityBuildCommandValidator, INamedItem
+// Main build configuration
+public interface IUniBuildCommandsMap
 {
     bool PlayerBuildEnabled { get; }
-    UniBuildConfigurationData BuildData { get; }
     IEnumerable<IUnityBuildCommand> PreBuildCommands { get; }
     IEnumerable<IUnityBuildCommand> PostBuildCommands { get; }
 }
 
-// Build command interface
-public interface IUnityBuildCommand : IUnityBuildCommandValidator, IUnityBuildCommandInfo
+// Base command interface
+public interface IUnityBuildCommand
 {
+    string Name { get; }
     void Execute(IUniBuilderConfiguration configuration);
+    bool Validate(IUniBuilderConfiguration config);
 }
 ```
+
+**Ready-to-use Base Classes:**
+
+UniGame.UniBuild provides two convenient base classes for implementing commands:
+
+1. **SerializableBuildCommand** - For inline serializable commands
+
+2. **UnityBuildCommand** - For ScriptableObject-based reusable commands
+
+Both classes implement `IUnityBuildCommand` and handle all the boilerplate, allowing you to focus on the command logic in the `Execute()` method.
 
 ### Build Pipeline Flow
 
-```mermaid
-graph TD
-    A[Start Build] --> B[Initialize Configuration]
-    B --> C[Validate Commands]
-    C --> D[Execute Pre-Build Commands]
-    D --> E{Player Build Enabled?}
-    E -->|Yes| F[Execute Unity Build]
-    E -->|No| G[Skip Build]
-    F --> H[Execute Post-Build Commands]
-    G --> H
-    H --> I[Generate Build Report]
-    I --> J[Finish Build]
 ```
-
-### Configuration System
-
-Build configurations are managed through:
-
-- **UniBuildCommandsMap**: Main configuration asset
-- **UniBuildConfigurationData**: Build settings and parameters
-- **BuildParameters**: Runtime build parameters
-- **ArgumentsProvider**: Command-line arguments handling
-
-## Build Configuration
-
-### Build Settings
-
-Configure basic build settings:
-
-```csharp
-[Serializable]
-public class UniBuildConfigurationData
-{
-    public bool printBuildReport = true;
-    public bool overrideArtifactName = true;
-    public string artifactName = string.Empty;
-    public bool overrideProductName = false;
-    public string productName = string.Empty;
-    
-    public BuildTarget buildTarget;
-    public BuildTargetGroup buildTargetGroup;
-    public StandaloneBuildSubtarget standaloneBuildSubTarget;
-    public ScriptingImplementation scriptingImplementation;
-    public Il2CppCodeGeneration il2CppCodeGeneration;
-    public Il2CppCompilerConfiguration cppCompilerConfiguration;
-}
-```
-
-### Platform Configuration
-
-Platform-specific settings:
-
-```csharp
-// Android settings
-public class UniAndroidSettings
-{
-    public AndroidBuildType AndroidBuildType;
-    public AndroidArchitecture AndroidArchitecture;
-    public ApiCompatibilityLevel ApiCompatibilityLevel;
-    public bool BuildAppBundle;
-    public bool AllowDebugging;
-    public ScriptingImplementation ScriptingBackend;
-}
-
-// iOS settings
-public class UniiOSSettings
-{
-    public iOSTargetDevice TargetDevice;
-    public iOSSdkVersion SdkVersion;
-    public string TargetOSVersionString;
-}
-```
-
-### Build Options
-
-Configure Unity build options:
-
-```csharp
-public class BuildOptionsCommand : SerializableBuildCommand
-{
-    public bool setIncrementalIl2CppBuild = true;
-    public BuildOptions[] buildOptions = { BuildOptions.None };
-    
-    public override void Execute(IUniBuilderConfiguration configuration)
-    {
-        var options = BuildOptions.None;
-        foreach (var option in buildOptions)
-            options |= option;
-            
-        configuration.BuildParameters.SetBuildOptions(options, false);
-    }
-}
-```
-
-### WebGL Settings
-
-WebGL-specific configuration:
-
-```csharp
-[Serializable]
-public class WebGlBuildData
-{
-    public bool ShowDiagnostics = false;
-    public Vector2Int Resolution = new(1080, 1920);
-    public int MaxMemorySize = 1024;
-    public bool DataCaching = true;
-    public WebGLExceptionSupport ExceptionSupport;
-    public WebGLDebugSymbolMode DebugSymbolMode;
-    public WebGLCompressionFormat CompressionFormat;
-    public WebGLLinkerTarget LinkerTarget;
-}
+Start Build
+    ↓
+Initialize Configuration
+    ↓
+Execute Pre-Build Commands (in order)
+    ↓
+Execute Unity Build (if enabled)
+    ↓
+Execute Post-Build Commands (in order)
+    ↓
+Generate Build Report
+    ↓
+Finish Build
 ```
 
 ## Command System
 
 ### Command Types
 
-UniBuild supports several command types:
+UniBuild supports:
 
-1. **SerializableBuildCommand**: Inline serializable commands
-2. **UnityBuildCommand**: ScriptableObject-based commands
-3. **IUnityPreBuildCommand**: Pre-build execution commands
-4. **IUnityPostBuildCommand**: Post-build execution commands
+1. **SerializableBuildCommand**: Inline commands, serialized in pipeline
+2. **UnityBuildCommand**: ScriptableObject-based reusable commands
+3. **IUnityBuildCommand**: Base interface implemented by all commands
 
 ### Creating Commands
 
-#### Serializable Command
+#### Simple Serializable Command
 
 ```csharp
-[Serializable]
-public class CustomBuildCommand : SerializableBuildCommand
+using UniGame.UniBuild.Editor.Commands;
+using UnityEngine;
+
+[System.Serializable]
+public class PrintBuildInfoCommand : SerializableBuildCommand
 {
-    public string customParameter = "default";
-    public bool enableFeature = true;
+    public string messagePrefix = "Build Info: ";
     
     public override void Execute(IUniBuilderConfiguration configuration)
     {
-        var arguments = configuration.Arguments;
-        var buildParams = configuration.BuildParameters;
+        var target = configuration.BuildParameters.buildTarget;
+        var output = configuration.BuildParameters.outputFolder;
         
-        // Custom build logic here
-        Debug.Log($"Executing custom command with parameter: {customParameter}");
-        
-        // Access build arguments
-        if (arguments.GetBoolValue("-customFlag", out bool flag))
-        {
-            Debug.Log($"Custom flag: {flag}");
-        }
+        Debug.Log($"{messagePrefix}Target={target}, Output={output}");
     }
 }
 ```
+
+Add to pipeline:
+1. Open Pipeline Editor
+2. Click "+ Add Step"
+3. Select "Print Build Info Command"
+4. Configure the prefix text if needed
 
 #### ScriptableObject Command
 
+Create a reusable command asset:
+
 ```csharp
-[CreateAssetMenu(menuName = "UniBuild/Commands/CustomCommand")]
-public class CustomUnityCommand : UnityBuildCommand
+using UniGame.UniBuild.Editor.Commands;
+using UnityEngine;
+
+[CreateAssetMenu(menuName = "UniBuild/Commands/DeployCommand")]
+public class DeployCommand : UnityBuildCommand
 {
-    [SerializeField] private string targetPath = "Builds/";
-    [SerializeField] private bool cleanBeforeBuild = true;
+    [SerializeField] private string deployPath = "Builds/";
+    [SerializeField] private bool deleteOld = true;
     
     public override void Execute(IUniBuilderConfiguration configuration)
     {
-        if (cleanBeforeBuild)
-        {
-            // Clean target directory
-            if (Directory.Exists(targetPath))
-                Directory.Delete(targetPath, true);
-        }
+        if (deleteOld && System.IO.Directory.Exists(deployPath))
+            System.IO.Directory.Delete(deployPath, true);
         
-        // Custom command logic
-        BuildLogger.Log($"Custom command executed for target: {targetPath}");
+        BuildLogger.Log($"Deployed to: {deployPath}");
     }
 }
 ```
+
+Create asset:
+1. Right-click in Project
+2. **Create → UniBuild → Commands → Deploy Command**
+3. Drag-drop the asset into a pipeline step
 
 ### Built-in Commands
 
-UniBuild includes many built-in commands:
+Common pre-built commands available:
 
-#### Platform Commands
-- **ApplyAndroidSettingsCommand**: Configure Android build settings
-- **ApplyWebGLSettingsCommand**: Configure WebGL build settings
-- **SwitchActiveBuildTargetCommand**: Change active build target
+**Platform Configuration**
+- `ApplyAndroidSettingsCommand` - Android build settings
+- `ApplyWebGLSettingsCommand` - WebGL configuration
+- `SwitchActiveBuildTargetCommand` - Change build target
 
-#### Build Configuration Commands
-- **ApplyBuildArgumentsCommand**: Apply custom build arguments
-- **BuildOptionsCommand**: Set Unity build options
-- **SetScriptingBackendCommand**: Configure scripting backend
-- **SetManagedStrippingLevelCommand**: Set code stripping level
+**Build Setup**
+- `ApplyBuildArgumentsCommand` - Apply command-line arguments
+- `BuildOptionsCommand` - Set Unity BuildOptions
+- `SetScriptingBackendCommand` - IL2CPP or Mono
+- `ApplyArtifactNameCommand` - Output filename
 
-#### Utility Commands
-- **ApplyArtifactNameCommand**: Configure output artifact naming
-- **ApplyLocationByArtifactCommand**: Set build output location
-- **UpdateVersionCommand**: Update build version numbers
-- **ApplyScriptingDefineSymbolsCommand**: Manage scripting defines
+**Asset Management**
+- `ReimportAssetsCommand` - Reimport selected assets
+- `ApplyScriptingDefineSymbolsCommand` - Manage #define symbols
 
-#### Asset Commands
-- **ReimportAssetsCommand**: Reimport specified assets
-- **DefineSymbolsAssetCommand**: Manage define symbols
+**View All Commands in Pipeline Editor**
 
-### Command Execution
+Open the **Commands Catalog** tab in the Build Pipeline Editor to browse all available commands with descriptions:
 
-Commands are executed in order within command groups:
+![Commands Catalog](https://i.ibb.co/zVQ9sv12/commands-info.png)
 
-```csharp
-public class BuildCommandStep
-{
-    public UnityBuildCommand buildCommand;
-    public IUnityBuildCommand serializableCommand;
-    
-    public IEnumerable<IUnityBuildCommand> GetCommands()
-    {
-        if (buildCommand != null) yield return buildCommand;
-        if (serializableCommand != null) yield return serializableCommand;
-    }
-}
-```
+The Commands Catalog shows:
+- All available commands with their metadata
+- Command descriptions and categories
+- Search functionality to find specific commands
+- Real-time command discovery
 
-## Build Pipeline
+### Adding Command Metadata
 
-### Pre-Build Commands
-
-Pre-build commands execute before the Unity build process:
+Make your custom commands discoverable in the Commands Catalog by using the `BuildCommandMetadataAttribute`:
 
 ```csharp
-public interface IUnityPreBuildCommand : IUnityBuildCommand
+using UniGame.UniBuild.Editor.Inspector;
+using UnityEngine;
+
+[BuildCommandMetadata(
+    displayName: "Deploy to Server",
+    description: "Uploads the build artifacts to the deployment server",
+    category: "Deployment",
+    iconPath: "Assets/Icons/deploy.png"
+)]
+[System.Serializable]
+public class DeployToServerCommand : SerializableBuildCommand
 {
-    // Marker interface for pre-build commands
-}
-```
-
-Common pre-build tasks:
-- Setting up build environment
-- Configuring player settings
-- Preparing assets
-- Validating build requirements
-
-### Build Process
-
-The core build process:
-
-```csharp
-public class UnityPlayerBuilder : IUnityPlayerBuilder
-{
-    public BuildReport Build(IUniBuilderConfiguration configuration)
-    {
-        BuildLogger.Initialize();
-        
-        // Apply build settings
-        var buildParameters = configuration.BuildParameters;
-        buildParameters.Execute();
-        
-        // Execute pre-build commands
-        ExecuteCommands(commandsMap.PreBuildCommands, configuration);
-        
-        // Execute Unity build
-        BuildReport report = null;
-        if (commandsMap.PlayerBuildEnabled)
-        {
-            report = ExecuteBuild(configuration);
-            configuration.BuildReport = report;
-        }
-        
-        // Execute post-build commands
-        ExecuteCommands(commandsMap.PostBuildCommands, configuration);
-        
-        return report;
-    }
-}
-```
-
-### Post-Build Commands
-
-Post-build commands execute after the Unity build:
-
-```csharp
-public interface IUnityPostBuildCommand : IUnityBuildCommand
-{
-    // Marker interface for post-build commands
-}
-```
-
-Common post-build tasks:
-- Copying build artifacts
-- Running tests
-- Uploading to distribution platforms
-- Generating reports
-
-### Build Validation
-
-Commands can implement validation logic:
-
-```csharp
-public interface IUnityBuildCommandValidator
-{
-    bool Validate(IUniBuilderConfiguration config);
-}
-
-public class PlatformSpecificCommand : SerializableBuildCommand
-{
-    public BuildTarget targetPlatform = BuildTarget.Android;
-    
-    public override bool Validate(IUniBuilderConfiguration config)
-    {
-        return config.BuildParameters.buildTarget == targetPlatform;
-    }
-}
-```
-
-## Console Arguments
-
-### Built-in Arguments
-
-UniBuild supports comprehensive command-line arguments:
-
-#### Build Configuration
-```bash
-# Git branch
--gitBranch:develop
-
-# Build options (Unity BuildOptions enum)
--buildOptions:Development,AutoRunPlayer,CleanBuildCache
-
-# Bundle version
--bundleVersion:"1.0.0"
-
-# Build number
--buildnumber:1000
-
-# Output configuration
--outputFileName:MyGame.exe
--outputFolder:Builds
-
-# Bundle ID
--bundleId:"com.company.game"
-```
-
-#### Platform Settings
-```bash
-# Build target
--buildTarget:Android
-
-# Build target group
--buildTargetGroup:Android
-
-# Scripting implementation
--scriptingImplementation:IL2CPP
-
-# Standalone subtarget
--standaloneBuildSubtarget:Player
-```
-
-#### Development Options
-```bash
-# Development build
--developmentBuild
-
-# Auto-connect profiler
--autoconnectProfiler
-
-# Deep profiling
--deepProfiling
-
-# Script debugging
--scriptDebugging
-```
-
-#### WebGL Options
-```bash
-# WebGL diagnostics
--webShowDiagnostics
-
-# Compression format
--webCompressionFormat:Brotli
-
-# Memory size
--webMemorySize:1024
-
-# Data caching
--webDataCaching
-
-# Code optimization
--webCodeOptimization:BuildTimes
-```
-
-### Custom Arguments
-
-Create custom argument handling:
-
-```csharp
-[Serializable]
-public class CustomArgumentsCommand : SerializableBuildCommand
-{
-    public string customIntArgument = "-customInt";
-    public string customBoolArgument = "-customBool";
-    public string customEnumArgument = "-customEnum";
-    public int defaultIntValue = 100;
-    
-    public override void Execute(IUniBuilderConfiguration buildParameters)
-    {
-        var arguments = buildParameters.Arguments;
-        
-        // Get integer argument
-        var intExists = arguments.GetIntValue(customIntArgument, out var intValue, defaultIntValue);
-        
-        // Get boolean argument
-        var boolExists = arguments.GetBoolValue(customBoolArgument, out var boolValue, false);
-        
-        // Get enum argument
-        var enumExists = arguments.GetEnumValue(customEnumArgument, out CustomEnum enumValue);
-        
-        // Set argument for other commands
-        arguments.SetValue(customIntArgument, intValue.ToString());
-        
-        BuildLogger.Log($"Custom arguments - Int: {intValue}, Bool: {boolValue}, Enum: {enumValue}");
-    }
-    
-    public enum CustomEnum
-    {
-        None,
-        Option1,
-        Option2
-    }
-}
-```
-
-### Arguments API
-
-The arguments provider interface:
-
-```csharp
-public interface IArgumentsProvider
-{
-    List<string> SourceArguments { get; }
-    IReadOnlyDictionary<string, string> Arguments { get; }
-    
-    string EvaluateValue(string expression);
-    void SetArgument(string key, string value);
-    string SetValue(string key, string value);
-    
-    bool GetIntValue(string name, out int result, int defaultValue = 0);
-    bool GetBoolValue(string name, out bool result, bool defaultValue = false);
-    bool Contains(string name);
-    bool GetEnumValue<TEnum>(string parameterName, out TEnum result) where TEnum : struct;
-    bool GetStringValue(string name, out string result, string defaultValue = "");
-}
-```
-
-## Build Reporting
-
-### Build Reports
-
-UniBuild generates comprehensive build reports:
-
-```csharp
-public class BuildReportData
-{
-    public bool writeToFile = true;
-    public bool writeLog = true;
-    public BuildReport report;
-}
-
-public class UniBuildReportBuilder
-{
-    public void ApplyReport(BuildReportData reportData)
-    {
-        var report = reportData.report;
-        if (report == null) return;
-        
-        PrintSummaryInfo(reportData, _reportBuilder);
-        PrintStrippingInfo(reportData, _reportBuilder);
-        PrintStepsInfo(reportData, _reportBuilder);
-        PrintPackedInfo(reportData, _reportBuilder);
-        
-        var result = _reportBuilder.ToString();
-        
-        PrintToDebugLog(reportData, result);
-        PrintToFile(reportData, result);
-    }
-}
-```
-
-### Build Logger
-
-Centralized logging system:
-
-```csharp
-public static class BuildLogger
-{
-    public static void Initialize();
-    public static void Log(string log);
-    public static string LogWithTimeTrack(string log);
-    public static void Log(string log, string trackId, bool resetTime = false);
-    public static void Print();
-    public static void Finish();
-}
-
-// Usage in commands
-public override void Execute(IUniBuilderConfiguration configuration)
-{
-    var id = BuildLogger.LogWithTimeTrack("Starting custom operation");
-    
-    // Perform operation
-    DoCustomOperation();
-    
-    BuildLogger.Log("Custom operation completed", id);
-}
-```
-
-### Report Generation
-
-Build reports include:
-
-- **Build Summary**: Result, duration, output path, size
-- **Build Steps**: Detailed step-by-step execution log
-- **Asset Information**: Used assets, sizes, dependencies
-- **Error/Warning Summary**: Build issues and messages
-- **Performance Metrics**: Build times and resource usage
-
-## Unity Cloud Build
-
-### Cloud Build Integration
-
-UniBuild automatically generates Cloud Build methods:
-
-![Cloud Build Methods](https://i.gyazo.com/45904cff034647c439c4d1acf76750b4.png)
-
-Auto-generated content is stored in: `Assets/UniGame.Generated/UniBuild/Editor`
-
-### Auto-Generated Methods
-
-Cloud Build helper methods:
-
-```csharp
-public static class CloudBuildHelper
-{
-    public static void PreExportCONFIG_NAME()
-    {
-        // Pre-export setup
-        var configuration = CreateCommandParameters();
-        var commandsMap = LoadBuildConfiguration();
-        
-        // Execute pre-build commands
-        var preBuildCommands = commandsMap.PreBuildCommands;
-        preBuildCommands.ExecuteCommands();
-    }
-    
-    public static void PostExportCONFIG_NAME(string exportPath)
-    {
-        // Post-export processing
-        var configuration = CreateCommandParameters();
-        var commandsMap = LoadBuildConfiguration();
-        
-        // Execute post-build commands
-        var postBuildCommands = commandsMap.PostBuildCommands;
-        postBuildCommands.ExecuteCommands();
-    }
-}
-```
-
-## Advanced Features
-
-### Build Validation
-
-Implement build validation:
-
-```csharp
-public class BuildValidator : SerializableBuildCommand
-{
-    public override bool Validate(IUniBuilderConfiguration config)
-    {
-        var buildParams = config.BuildParameters;
-        
-        // Validate build target
-        if (buildParams.buildTarget == BuildTarget.NoTarget)
-        {
-            Debug.LogError("Invalid build target");
-            return false;
-        }
-        
-        // Validate output path
-        if (string.IsNullOrEmpty(buildParams.outputFolder))
-        {
-            Debug.LogError("Output folder not specified");
-            return false;
-        }
-        
-        return true;
-    }
-}
-```
-
-### Command Groups
-
-Group related commands:
-
-```csharp
-[CreateAssetMenu(menuName = "UniBuild/ScriptableCommandsGroup")]
-public class ScriptableCommandsGroup : UnityBuildCommand, 
-    IUnityPreBuildCommand, IUnityPostBuildCommand
-{
-    public ApplyBuildArgumentsCommand arguments = new();
-    public BuildCommands commands = new();
+    [SerializeField] private string serverUrl = "ftp://deploy.example.com";
+    [SerializeField] private bool deleteOldBuilds = true;
     
     public override void Execute(IUniBuilderConfiguration configuration)
     {
-        arguments.Execute(configuration);
-        
+        // Your deployment logic here
+        BuildLogger.Log($"Deploying to: {serverUrl}");
+    }
+}
+```
+
+**BuildCommandMetadataAttribute Parameters:**
+- `displayName` - Human-readable command name shown in UI
+- `description` - Detailed description of what the command does
+- `category` - Category for organizing commands (e.g., "Deployment", "Platform", "Assets")
+- `iconPath` - Optional path to icon asset for visual identification
+
+The metadata is automatically used when:
+- Adding steps in the Pipeline Editor
+- Displaying commands in the Commands Catalog
+- Building the command discovery system
+
+## Build Pipeline
+
+### Pipeline Execution
+
+Pipelines automatically:
+
+1. **Validate all commands** before execution
+2. **Execute pre-build commands** in order (top to bottom)
+3. **Build Unity player** (if enabled)
+4. **Execute post-build commands** in order
+5. **Generate build report** with execution times
+
+### Command Groups
+
+Group related commands for organization:
+
+```csharp
+[CreateAssetMenu(menuName = "UniBuild/Create CommandsGroup")]
+public class PipelineCommandsGroup : UnityBuildCommand
+{
+    public BuildCommands commands = new BuildCommands();
+    
+    public override void Execute(IUniBuilderConfiguration configuration)
+    {
         foreach (var command in commands.Commands)
         {
             if (command.IsActive)
@@ -760,199 +347,62 @@ public class ScriptableCommandsGroup : UnityBuildCommand,
 }
 ```
 
-### Build Environment Types
+Use in pipeline:
+1. Create group asset: **Create → UniBuild → Create CommandsGroup**
+2. Add as a step in pipeline
+3. Expand the group to add nested commands
+4. Commands in group execute together
 
-Support different build environments:
+## Console Arguments
 
-```csharp
-public enum BuildEnvironmentType
-{
-    Custom,
-    UnityCloudBuild
-}
-
-public class EnvironmentSpecificCommand : SerializableBuildCommand
-{
-    public BuildEnvironmentType targetEnvironment = BuildEnvironmentType.Custom;
-    
-    public override bool Validate(IUniBuilderConfiguration config)
-    {
-        return config.BuildParameters.environmentType == targetEnvironment;
-    }
-}
-```
-
-### Editor Integration
-
-Menu generation and editor windows:
-
-![Build Menu](https://github.com/UnioGame/UniGame.UniBuild/blob/master/GitAssets/unibuild4.png)
-
-![Build Configurations Window](https://github.com/UnioGame/UniGame.UniBuild/blob/master/GitAssets/unibuild3.png)
+Common arguments:
+- `-buildTarget` - Build target (Android, iOS, WebGL, etc.)
+- `-bundleVersion` - Version string
+- `-buildnumber` - Build number
+- `-outputFolder` - Output directory
+- `-outputFileName` - Output filename
+- `-developmentBuild` - Development build flag
+- `-gitBranch` - Git branch name
 
 ## Examples
 
-### Basic Build Configuration
+### Example 1: Custom Setup Command
 
 ```csharp
-// Create a simple Android build configuration
-var buildConfig = CreateInstance<UniBuildCommandsMap>();
-buildConfig.BuildData.buildTarget = BuildTarget.Android;
-buildConfig.BuildData.buildTargetGroup = BuildTargetGroup.Android;
-buildConfig.BuildData.artifactName = "MyGame.apk";
-
-// Add pre-build commands
-var androidSettings = new ApplyAndroidSettingsCommand();
-androidSettings.androidSettings.BuildAppBundle = true;
-buildConfig.preBuildCommands.Add(new BuildCommandStep
+[System.Serializable]
+public class SetupProjectCommand : SerializableBuildCommand
 {
-    serializableCommand = androidSettings
-});
-
-// Add post-build commands
-var openDirectory = new OpenDirectoryCommand();
-openDirectory.folderPath.Add("Builds/");
-buildConfig.postBuildCommands.Add(new BuildCommandStep
-{
-    serializableCommand = openDirectory
-});
-```
-
-### Custom Commands
-
-```csharp
-[Serializable]
-public class DeployToServerCommand : SerializableBuildCommand
-{
-    public string serverUrl = "ftp://deploy.server.com";
-    public string username = "deploy_user";
-    public string buildPath = "Builds/";
+    [SerializeField] private bool clearCache = true;
+    
+    public override bool Validate(IUniBuilderConfiguration config)
+    {
+        if (config.BuildParameters.buildTarget == BuildTarget.NoTarget)
+        {
+            Debug.LogError("Build target not set!");
+            return false;
+        }
+        return true;
+    }
     
     public override void Execute(IUniBuilderConfiguration configuration)
     {
-        var buildReport = configuration.BuildReport;
-        if (buildReport?.summary.result != BuildResult.Succeeded)
-        {
-            BuildLogger.Log("Build failed, skipping deployment");
-            return;
-        }
+        var target = configuration.BuildParameters.buildTarget;
+        Debug.Log($"Setting up project for {target}");
         
-        var outputPath = buildReport.summary.outputPath;
-        BuildLogger.Log($"Deploying build from: {outputPath}");
+        if (clearCache)
+            System.IO.Directory.Delete("Library/ScriptAssemblies", true);
         
-        // Upload logic here
-        UploadToServer(outputPath, serverUrl, username);
-        
-        BuildLogger.Log("Deployment completed successfully");
-    }
-    
-    private void UploadToServer(string localPath, string server, string user)
-    {
-        // Implementation for file upload
+        AssetDatabase.Refresh();
     }
 }
-```
-
-### CI/CD Integration
-
-```bash
-#!/bin/bash
-# Jenkins/GitHub Actions build script
-
-# Unity build with UniBuild
-Unity -batchmode -quit \
-    -projectPath /path/to/project \
-    -executeMethod UniGame.UniBuild.Editor.UniBuildTool.BuildUnityPlayer \
-    -buildTarget Android \
-    -bundleVersion "1.2.3" \
-    -buildnumber $BUILD_NUMBER \
-    -outputFolder "Builds" \
-    -outputFileName "MyGame.apk" \
-    -developmentBuild \
-    -gitBranch $GIT_BRANCH
 ```
 
 ## Best Practices
 
-1. **Modular Commands**: Keep commands focused on single responsibilities
-2. **Validation**: Always implement proper validation in commands
-3. **Error Handling**: Use try-catch blocks and proper error reporting
-4. **Logging**: Use BuildLogger for consistent logging across commands
-5. **Platform Abstraction**: Create platform-agnostic commands when possible
-6. **Configuration Management**: Use ScriptableObject commands for reusable configurations
-7. **Build Validation**: Validate build settings before starting the build process
-8. **Clean Builds**: Implement proper cleanup in pre-build commands
-9. **Version Management**: Automate version updates in build pipeline
-10. **CI/CD Integration**: Design commands to work well with automated systems
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Build Configuration Not Found**
-   - Ensure build configuration assets are properly created
-   - Check that configurations match the target platform
-
-2. **Command Execution Failures**
-   - Verify command validation logic
-   - Check command dependencies and prerequisites
-   - Review BuildLogger output for detailed error information
-
-3. **Unity Cloud Build Issues**
-   - Regenerate cloud build methods after configuration changes
-   - Verify cloud build method signatures match Unity requirements
-
-4. **Platform-Specific Problems**
-   - Ensure platform-specific settings are properly configured
-   - Check Unity version compatibility with target platforms
-
-5. **Performance Issues**
-   - Review command execution order and dependencies
-   - Optimize heavy operations in custom commands
-   - Use async operations where appropriate
-
-### Debug Tips
-
-```csharp
-// Enable verbose logging
-BuildLogger.Log("Debug information", "DEBUG_ID");
-
-// Check build configuration
-public override bool Validate(IUniBuilderConfiguration config)
-{
-    Debug.Log($"Validating for target: {config.BuildParameters.buildTarget}");
-    return base.Validate(config);
-}
-
-// Monitor command execution
-public override void Execute(IUniBuilderConfiguration configuration)
-{
-    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-    
-    try
-    {
-        // Command logic
-        DoWork();
-    }
-    catch (Exception ex)
-    {
-        BuildLogger.Log($"Command failed: {ex.Message}");
-        throw;
-    }
-    finally
-    {
-        stopwatch.Stop();
-        BuildLogger.Log($"Command completed in {stopwatch.ElapsedMilliseconds}ms");
-    }
-}
-```
-
-For additional commands and extended functionality, check out:
-- [UniGame Build Commands](https://github.com/UnioGame/UnioGame.UniBuildCommands)
-
-This package includes additional commands for:
-- Addressable Asset System
-- FTP operations
-- Web requests
-- File and folder operations
-- Platform-specific utilities
+1. **Keep Commands Simple** - Each command should do one thing well
+2. **Validate Input** - Always validate configuration before executing
+3. **Use Logging** - Use `BuildLogger.Log()` for debugging and reporting
+4. **Group Related Commands** - Use command groups for organization
+5. **Test Locally** - Test build pipelines locally before CI/CD integration
+6. **Document Parameters** - Add [Tooltip] attributes to command properties
+7.  **Order Matters** - Arrange commands logically (setup before build, deploy after)

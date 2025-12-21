@@ -20,7 +20,7 @@ namespace UniGame.UniBuild.Editor
     using TriInspector;
 #endif
 
-    [CreateAssetMenu(menuName = "UniBuild/UniBuildConfiguration",fileName = "UniGame Builder")]
+    [CreateAssetMenu(menuName = "UniBuild/UniBuild Pipeline",fileName = "UniBuild Pipeline")]
     public class UniBuildPipeline : ScriptableObject, IUniBuildCommandsMap
     {
         public const string SettingsTabKey = "settings";
