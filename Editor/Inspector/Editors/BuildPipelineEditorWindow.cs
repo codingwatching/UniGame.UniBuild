@@ -536,28 +536,40 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             }
 
             // Pre-build commands
+            int stepIndex = 0;
             foreach (var command in _selectedPipeline.preBuildCommands)
             {
-                var stepItem = CreatePipelineStepItem(command);
+                var stepItem = CreatePipelineStepItem(command, stepIndex, _selectedPipeline.preBuildCommands, true);
                 _pipelineEditorContainer.Add(stepItem);
+                stepIndex++;
             }
 
             // Post-build commands
             foreach (var command in _selectedPipeline.postBuildCommands)
             {
-                var stepItem = CreatePipelineStepItem(command);
+                var stepItem = CreatePipelineStepItem(command, stepIndex, _selectedPipeline.postBuildCommands, false);
                 _pipelineEditorContainer.Add(stepItem);
+                stepIndex++;
             }
         }
 
-        private VisualElement CreatePipelineStepItem(BuildCommandStep step)
+        private VisualElement CreatePipelineStepItem(BuildCommandStep step, int stepIndex, List<BuildCommandStep> stepsList, bool isPreBuild)
         {
             var container = new VisualElement();
             container.style.flexDirection = FlexDirection.Column;
-            container.style.marginBottom = 12;
+            container.style.marginBottom = 4;
             container.style.borderBottomWidth = 1;
             container.style.borderBottomColor = new StyleColor(new Color(0.2f, 0.2f, 0.2f));
-            container.style.paddingBottom = 12;
+            container.style.paddingBottom = 4;
+            
+            // Alternating background colors
+            var bgColor = stepIndex % 2 == 0 
+                ? new Color(0.12f, 0.12f, 0.12f) 
+                : new Color(0.16f, 0.16f, 0.16f);
+            container.style.backgroundColor = new StyleColor(bgColor);
+            container.style.paddingLeft = 4;
+            container.style.paddingRight = 4;
+            container.style.paddingTop = 2;
 
             // Get all commands from the step
             var commands = step.GetCommands().ToList();
@@ -595,31 +607,50 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             stepFoldout.style.paddingLeft = 0;
             stepFoldout.style.marginBottom = 0;
 
-            // Step header with Run and Remove buttons on the same line
-            var stepHeaderRow = new VisualElement();
-            stepHeaderRow.style.flexDirection = FlexDirection.Row;
-            stepHeaderRow.style.alignItems = Align.Center;
-            stepHeaderRow.style.justifyContent = Justify.FlexEnd;
-            stepHeaderRow.style.paddingLeft = 8;
-            stepHeaderRow.style.paddingRight = 8;
-            stepHeaderRow.style.paddingTop = 4;
-            stepHeaderRow.style.paddingBottom = 4;
-            stepHeaderRow.style.marginBottom = 0;
+            // Only add step header for non-group commands
+            // For PipelineCommandsGroup, the group header will have the buttons instead
+            bool isGroupCommand = commands.Count > 0 && commands[0] is PipelineCommandsGroup;
+            
+            if (!isGroupCommand)
+            {
+                // Step header with Run and Remove buttons on the same line
+                var stepHeaderRow = new VisualElement();
+                stepHeaderRow.style.flexDirection = FlexDirection.Row;
+                stepHeaderRow.style.alignItems = Align.Center;
+                stepHeaderRow.style.justifyContent = Justify.FlexEnd;
+                stepHeaderRow.style.paddingLeft = 8;
+                stepHeaderRow.style.paddingRight = 8;
+                stepHeaderRow.style.paddingTop = 4;
+                stepHeaderRow.style.paddingBottom = 4;
+                stepHeaderRow.style.marginBottom = 0;
 
-            // Run button for the step
-            var runStepButton = new Button(() => ExecuteStep(step.GetCommands().FirstOrDefault())) { text = "Run" };
-            runStepButton.style.width = 50;
-            runStepButton.style.marginRight = 4;
-            stepHeaderRow.Add(runStepButton);
+                // Move up button
+                var moveUpButton = new Button(() => MoveStepUp(step, stepsList)) { text = "↑" };
+                moveUpButton.style.width = 30;
+                moveUpButton.style.marginRight = 2;
+                stepHeaderRow.Add(moveUpButton);
 
-            // Remove button for the step
-            var deleteButton = new Button(() => RemoveStep(step)) { text = "Remove Step" };
-            deleteButton.style.width = 100;
-            deleteButton.AddToClassList("button-danger");
-            stepHeaderRow.Add(deleteButton);
+                // Move down button
+                var moveDownButton = new Button(() => MoveStepDown(step, stepsList)) { text = "↓" };
+                moveDownButton.style.width = 30;
+                moveDownButton.style.marginRight = 4;
+                stepHeaderRow.Add(moveDownButton);
 
-            // Add header to foldout's toggle area
-            stepFoldout.Add(stepHeaderRow);
+                // Run button for the step
+                var runStepButton = new Button(() => ExecuteStep(step.GetCommands().FirstOrDefault())) { text = "Run" };
+                runStepButton.style.width = 50;
+                runStepButton.style.marginRight = 4;
+                stepHeaderRow.Add(runStepButton);
+
+                // Remove button for the step
+                var deleteButton = new Button(() => RemoveStep(step)) { text = "Remove Step" };
+                deleteButton.style.width = 100;
+                deleteButton.AddToClassList("button-danger");
+                stepHeaderRow.Add(deleteButton);
+
+                // Add header to foldout's toggle area
+                stepFoldout.Add(stepHeaderRow);
+            }
 
             // Create content container for all commands
             var contentContainer = new VisualElement();
@@ -699,36 +730,94 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                         // For group commands, show each nested command as separate item
                         var nestedCommandsList = group.commands.Commands.ToList();
                         
-                        var groupHeaderContainer = new VisualElement();
-                        groupHeaderContainer.style.flexDirection = FlexDirection.Column;
-                        groupHeaderContainer.style.marginLeft = 8;
-                        groupHeaderContainer.style.marginRight = 8;
-                        groupHeaderContainer.style.marginTop = 8;
-                        groupHeaderContainer.style.marginBottom = 8;
+                        // Create a wrapper container to hold header + foldout
+                        var groupWrapper = new VisualElement();
+                        groupWrapper.style.flexDirection = FlexDirection.Column;
+                        groupWrapper.style.marginLeft = 0;
+                        groupWrapper.style.marginRight = 0;
+                        groupWrapper.style.marginTop = 4;
+                        groupWrapper.style.marginBottom = 4;
 
-                        // Group header
+                        // Group header row with toggle, type, and buttons on same line
                         var groupHeaderRow = new VisualElement();
                         groupHeaderRow.style.flexDirection = FlexDirection.Row;
                         groupHeaderRow.style.alignItems = Align.Center;
                         groupHeaderRow.style.justifyContent = Justify.SpaceBetween;
-                        groupHeaderRow.style.marginBottom = 6;
-                        groupHeaderRow.style.paddingBottom = 4;
-                        groupHeaderRow.style.borderBottomWidth = 1;
-                        groupHeaderRow.style.borderBottomColor = new StyleColor(new Color(0.35f, 0.35f, 0.35f));
+                        groupHeaderRow.style.paddingLeft = 8;
+                        groupHeaderRow.style.paddingRight = 8;
+                        groupHeaderRow.style.paddingTop = 2;
+                        groupHeaderRow.style.paddingBottom = 2;
 
-                        var groupLabel = new Label($"Command Group: {command.Name}");
-                        groupLabel.style.fontSize = 11;
-                        groupLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-                        groupLabel.style.color = new StyleColor(new Color(0.8f, 0.8f, 0.8f));
-                        groupHeaderRow.Add(groupLabel);
+                        // Left section: toggle, type, group name
+                        var leftSection = new VisualElement();
+                        leftSection.style.flexDirection = FlexDirection.Row;
+                        leftSection.style.alignItems = Align.Center;
+                        leftSection.style.flexGrow = 1;
 
-                        var groupRunBtn = new Button(() => ExecuteStep(command)) { text = "Run All" };
-                        groupRunBtn.style.width = 70;
-                        groupHeaderRow.Add(groupRunBtn);
+                        var groupToggle = new Toggle();
+                        groupToggle.value = command.IsActive;
+                        groupToggle.style.marginRight = 6;
+                        groupToggle.RegisterValueChangedCallback(evt =>
+                        {
+                            var field = command.GetType().GetField("isActive", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Instance);
+                            if (field != null)
+                            {
+                                field.SetValue(command, evt.newValue);
+                                EditorUtility.SetDirty(_selectedPipeline);
+                            }
+                        });
+                        leftSection.Add(groupToggle);
 
-                        groupHeaderContainer.Add(groupHeaderRow);
+                        var groupTypeLabel = new Label(command.GetType().Name);
+                        groupTypeLabel.style.fontSize = 9;
+                        groupTypeLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
+                        groupTypeLabel.style.marginRight = 8;
+                        leftSection.Add(groupTypeLabel);
 
-                        // Display each nested command as separate line
+                        var groupNameLabel = new Label($"Command Group: {command.Name}");
+                        groupNameLabel.style.fontSize = 10;
+                        groupNameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                        groupNameLabel.style.flexGrow = 1;
+                        leftSection.Add(groupNameLabel);
+
+                        // Right section: Run, Add Command, Remove Step buttons
+                        var rightSection = new VisualElement();
+                        rightSection.style.flexDirection = FlexDirection.Row;
+                        rightSection.style.alignItems = Align.Center;
+
+                        var groupRunBtn = new Button(() => ExecuteStep(command)) { text = "Run" };
+                        groupRunBtn.style.width = 50;
+                        groupRunBtn.style.marginRight = 4;
+                        rightSection.Add(groupRunBtn);
+
+                        var addCmdBtn = new Button(() => AddCommandToGroup(group)) { text = "Add Cmd" };
+                        addCmdBtn.style.width = 70;
+                        addCmdBtn.style.marginRight = 4;
+                        rightSection.Add(addCmdBtn);
+
+                        var removeGroupBtn = new Button(() => RemoveStep(step)) { text = "Remove Step" };
+                        removeGroupBtn.style.width = 100;
+                        removeGroupBtn.AddToClassList("button-danger");
+                        rightSection.Add(removeGroupBtn);
+
+                        groupHeaderRow.Add(leftSection);
+                        groupHeaderRow.Add(rightSection);
+                        groupWrapper.Add(groupHeaderRow);
+
+                        // Create foldout for nested commands
+                        var groupFoldout = new Foldout
+                        {
+                            text = "",
+                            value = true
+                        };
+                        groupFoldout.style.fontSize = 11;
+                        groupFoldout.style.paddingLeft = 0;
+                        groupFoldout.style.marginLeft = 8;
+                        groupFoldout.style.marginRight = 8;
+                        groupFoldout.style.marginTop = 0;
+                        groupFoldout.style.marginBottom = 0;
+
+                        // Display each nested command inside foldout
                         if (nestedCommandsList.Count > 0)
                         {
                             var nestedItemsContainer = new VisualElement();
@@ -738,8 +827,9 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                             nestedItemsContainer.style.borderLeftColor = new StyleColor(new Color(0.4f, 0.6f, 0.8f));
                             nestedItemsContainer.style.paddingLeft = 8;
 
-                            foreach (var nestedCmd in nestedCommandsList)
+                            for (int nestedIdx = 0; nestedIdx < nestedCommandsList.Count; nestedIdx++)
                             {
+                                var nestedCmd = nestedCommandsList[nestedIdx];
                                 if (nestedCmd == null) continue;
 
                                 var nestedItemContainer = new VisualElement();
@@ -782,10 +872,43 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                                 nestedTypeLabel.style.marginRight = 8;
                                 nestedHeaderRow.Add(nestedTypeLabel);
 
+                                // Find the BuildCommandStep for this nested command to pass to reorder methods
+                                BuildCommandStep nestedStep = null;
+                                foreach (var grpStep in group.commands.commands)
+                                {
+                                    var grpStepCommands = grpStep.GetCommands().ToList();
+                                    if (grpStepCommands.Contains(nestedCmd))
+                                    {
+                                        nestedStep = grpStep;
+                                        break;
+                                    }
+                                }
+
+                                // Move up button for nested command
+                                var nestedMoveUpBtn = new Button(() => MoveNestedCommandUp(group, nestedStep)) { text = "↑" };
+                                nestedMoveUpBtn.style.width = 30;
+                                nestedMoveUpBtn.style.fontSize = 9;
+                                nestedMoveUpBtn.style.marginRight = 2;
+                                nestedHeaderRow.Add(nestedMoveUpBtn);
+
+                                // Move down button for nested command
+                                var nestedMoveDownBtn = new Button(() => MoveNestedCommandDown(group, nestedStep)) { text = "↓" };
+                                nestedMoveDownBtn.style.width = 30;
+                                nestedMoveDownBtn.style.fontSize = 9;
+                                nestedMoveDownBtn.style.marginRight = 4;
+                                nestedHeaderRow.Add(nestedMoveDownBtn);
+
                                 var nestedExecuteBtn = new Button(() => ExecuteStep(nestedCmd)) { text = "Run" };
                                 nestedExecuteBtn.style.width = 45;
                                 nestedExecuteBtn.style.fontSize = 9;
+                                nestedExecuteBtn.style.marginRight = 4;
                                 nestedHeaderRow.Add(nestedExecuteBtn);
+
+                                var nestedRemoveBtn = new Button(() => RemoveCommandFromGroup(group, nestedCmd)) { text = "Del" };
+                                nestedRemoveBtn.style.width = 40;
+                                nestedRemoveBtn.style.fontSize = 9;
+                                nestedRemoveBtn.AddToClassList("button-danger");
+                                nestedHeaderRow.Add(nestedRemoveBtn);
 
                                 nestedItemContainer.Add(nestedHeaderRow);
 
@@ -803,7 +926,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                                 nestedItemsContainer.Add(nestedItemContainer);
                             }
 
-                            groupHeaderContainer.Add(nestedItemsContainer);
+                            groupFoldout.Add(nestedItemsContainer);
                         }
                         else
                         {
@@ -811,10 +934,11 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                             emptyLabel.style.color = new StyleColor(new Color(0.6f, 0.6f, 0.6f));
                             emptyLabel.style.fontSize = 9;
                             emptyLabel.style.marginLeft = 12;
-                            groupHeaderContainer.Add(emptyLabel);
+                            groupFoldout.Add(emptyLabel);
                         }
 
-                        contentContainer.Add(groupHeaderContainer);
+                        groupWrapper.Add(groupFoldout);
+                        contentContainer.Add(groupWrapper);
                     }
                     else
                     {
@@ -1285,6 +1409,118 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             EditorUtility.SetDirty(_selectedPipeline);
             RefreshPipelineEditor();
             UpdateStatusLabel("Step removed");
+        }
+
+        private void AddCommandToGroup(PipelineCommandsGroup group)
+        {
+            if (group == null || group.commands == null) return;
+
+            // Create a new empty build command step
+            var newStep = new BuildCommandStep();
+            newStep.serializableCommand = new EmptyBuildCommand();
+            
+            // Add to group's commands list
+            group.commands.commands.Add(newStep);
+
+            EditorUtility.SetDirty(_selectedPipeline);
+            RefreshPipelineEditor();
+            UpdateStatusLabel($"Added command to group: {group.Name}");
+        }
+
+        private void RemoveCommandFromGroup(PipelineCommandsGroup group, IUnityBuildCommand command)
+        {
+            if (group == null || group.commands == null || command == null) return;
+
+            // Find and remove the BuildCommandStep containing this command
+            var stepsToRemove = new List<BuildCommandStep>();
+            foreach (var step in group.commands.commands)
+            {
+                var stepCommands = step.GetCommands().ToList();
+                if (stepCommands.Contains(command))
+                {
+                    stepsToRemove.Add(step);
+                }
+            }
+
+            foreach (var step in stepsToRemove)
+            {
+                group.commands.commands.Remove(step);
+            }
+            
+            if (stepsToRemove.Count > 0)
+            {
+                EditorUtility.SetDirty(_selectedPipeline);
+                RefreshPipelineEditor();
+                UpdateStatusLabel($"Removed command from group: {group.Name}");
+            }
+        }
+
+        private void MoveStepUp(BuildCommandStep step, List<BuildCommandStep> stepsList)
+        {
+            if (stepsList == null || stepsList.Count < 2) return;
+
+            int currentIndex = stepsList.IndexOf(step);
+            if (currentIndex <= 0) return;
+
+            // Swap with previous step
+            var temp = stepsList[currentIndex];
+            stepsList[currentIndex] = stepsList[currentIndex - 1];
+            stepsList[currentIndex - 1] = temp;
+
+            EditorUtility.SetDirty(_selectedPipeline);
+            RefreshPipelineEditor();
+            UpdateStatusLabel("Step moved up");
+        }
+
+        private void MoveStepDown(BuildCommandStep step, List<BuildCommandStep> stepsList)
+        {
+            if (stepsList == null || stepsList.Count < 2) return;
+
+            int currentIndex = stepsList.IndexOf(step);
+            if (currentIndex >= stepsList.Count - 1) return;
+
+            // Swap with next step
+            var temp = stepsList[currentIndex];
+            stepsList[currentIndex] = stepsList[currentIndex + 1];
+            stepsList[currentIndex + 1] = temp;
+
+            EditorUtility.SetDirty(_selectedPipeline);
+            RefreshPipelineEditor();
+            UpdateStatusLabel("Step moved down");
+        }
+
+        private void MoveNestedCommandUp(PipelineCommandsGroup group, BuildCommandStep command)
+        {
+            if (group?.commands?.commands == null || group.commands.commands.Count < 2) return;
+
+            int currentIndex = group.commands.commands.IndexOf(command);
+            if (currentIndex <= 0) return;
+
+            // Swap with previous command
+            var temp = group.commands.commands[currentIndex];
+            group.commands.commands[currentIndex] = group.commands.commands[currentIndex - 1];
+            group.commands.commands[currentIndex - 1] = temp;
+
+            EditorUtility.SetDirty(_selectedPipeline);
+            RefreshPipelineEditor();
+            UpdateStatusLabel("Command moved up");
+        }
+
+        private void MoveNestedCommandDown(PipelineCommandsGroup group, BuildCommandStep command)
+        {
+            if (group?.commands?.commands == null || group.commands.commands.Count < 2) return;
+
+            int currentIndex = group.commands.commands.IndexOf(command);
+            if (currentIndex >= group.commands.commands.Count - 1) return;
+
+            // Swap with next command
+            var temp = group.commands.commands[currentIndex];
+            group.commands.commands[currentIndex] = group.commands.commands[currentIndex + 1];
+            group.commands.commands[currentIndex + 1] = temp;
+
+            EditorUtility.SetDirty(_selectedPipeline);
+            RefreshPipelineEditor();
+            UpdateStatusLabel("Command moved down");
         }
 
         private void PingSelectedPipeline()
