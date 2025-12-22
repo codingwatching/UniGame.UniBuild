@@ -1,5 +1,6 @@
 namespace UniGame.UniBuild.Editor
 {
+    using UnityEditor.Build.Profile;
     using UnityEditor.Build.Reporting;
 
     public interface IUniBuilderConfiguration

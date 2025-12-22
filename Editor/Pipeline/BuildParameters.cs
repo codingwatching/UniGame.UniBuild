@@ -322,9 +322,11 @@ namespace UniGame.UniBuild.Editor
             
             if(arguments.GetEnumValue<ScriptingImplementation>(BuildArguments.ScriptingImplementationKey,out var scripting))
                 scriptingImplementation = scripting;
-            
+
             if (arguments.GetIntValue(BuildArguments.BuildNumberKey, out var version))
+            {
                 buildNumber = version;
+            }
 
             arguments.GetStringValue(BuildArguments.BuildOutputFolderKey,
                 out var folder, BuildFolder);

@@ -7,6 +7,7 @@ namespace UniGame.UniBuild.Editor
     using global::UniGame.UniBuild.UpdateVersionCommand;
     using Inspector;
     using UnityEditor;
+    using UnityEditor.Build.Profile;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
     using Utils;
@@ -47,8 +48,19 @@ namespace UniGame.UniBuild.Editor
         public override void Execute(IUniBuilderConfiguration configuration)
         {
             var buildParameters = configuration.BuildParameters;
-            var branch = appendBranch ? configuration.BuildParameters.branch : null;
-            UpdateBuildVersion(buildParameters.buildTarget, buildParameters.buildNumber, branch);
+            var branch = appendBranch 
+                ? configuration.BuildParameters.branch 
+                : string.Empty;
+            
+            var buildNumber = buildParameters.buildNumber == 0 
+                ? BuildVersionProvider.GetActiveBuildNumber(buildParameters.buildTarget) 
+                : buildParameters.buildNumber;
+            
+            var buildTarget = buildParameters.buildTarget == BuildTarget.NoTarget 
+                ? EditorUserBuildSettings.activeBuildTarget 
+                : buildParameters.buildTarget;
+            
+            UpdateBuildVersion(buildTarget, buildNumber, branch);
         }
 
 #if ODIN_INSPECTOR || TRI_INSPECTOR
