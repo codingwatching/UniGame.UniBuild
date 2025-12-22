@@ -48,8 +48,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             groupWrapper.style.flexDirection = FlexDirection.Column;
             groupWrapper.style.marginLeft = 0;
             groupWrapper.style.marginRight = 0;
-            groupWrapper.style.marginTop = UIThemeConstants.Spacing.Margin;
-            groupWrapper.style.marginBottom = UIThemeConstants.Spacing.Margin;
+            groupWrapper.style.marginTop = 2;
+            groupWrapper.style.marginBottom = 2;
 
             // Group header
             var groupHeaderRow = CreateGroupHeader();
@@ -85,8 +85,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             groupHeaderRow.style.justifyContent = Justify.SpaceBetween;
             groupHeaderRow.style.paddingLeft = UIThemeConstants.Spacing.Padding;
             groupHeaderRow.style.paddingRight = UIThemeConstants.Spacing.Padding;
-            groupHeaderRow.style.paddingTop = UIThemeConstants.Spacing.SmallMargin;
-            groupHeaderRow.style.paddingBottom = UIThemeConstants.Spacing.SmallMargin;
+            groupHeaderRow.style.paddingTop = 1;
+            groupHeaderRow.style.paddingBottom = 1;
 
             // Left section: toggle, type, name
             var leftSection = new VisualElement();

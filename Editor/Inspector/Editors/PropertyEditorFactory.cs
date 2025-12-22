@@ -76,6 +76,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var textField = new TextField();
             textField.value = value ?? "";
             textField.style.flexGrow = 1;
+            ApplyCompactStyle(textField);
             textField.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -92,6 +93,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var intField = new IntegerField();
             intField.value = value;
             intField.style.flexGrow = 1;
+            ApplyCompactStyle(intField);
             intField.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -108,6 +110,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var floatField = new FloatField();
             floatField.value = value;
             floatField.style.flexGrow = 1;
+            ApplyCompactStyle(floatField);
             floatField.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -124,6 +127,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var boolField = new Toggle();
             boolField.value = value;
             boolField.style.flexGrow = 1;
+            ApplyCompactStyle(boolField);
             boolField.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -140,6 +144,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var v2Field = new Vector2Field();
             v2Field.value = value;
             v2Field.style.flexGrow = 1;
+            ApplyCompactStyle(v2Field);
             v2Field.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -156,6 +161,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var v3Field = new Vector3Field();
             v3Field.value = value;
             v3Field.style.flexGrow = 1;
+            ApplyCompactStyle(v3Field);
             v3Field.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -172,6 +178,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var v4Field = new Vector4Field();
             v4Field.value = value;
             v4Field.style.flexGrow = 1;
+            ApplyCompactStyle(v4Field);
             v4Field.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -188,6 +195,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var colorField = new ColorField();
             colorField.value = value;
             colorField.style.flexGrow = 1;
+            ApplyCompactStyle(colorField);
             colorField.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -205,6 +213,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             objField.objectType = objectType;
             objField.value = value;
             objField.style.flexGrow = 1;
+            ApplyCompactStyle(objField);
             objField.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -220,6 +229,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         {
             var enumField = new EnumField(value);
             enumField.style.flexGrow = 1;
+            ApplyCompactStyle(enumField);
             enumField.RegisterValueChangedCallback(evt =>
             {
                 fieldInfo.SetValue(instance, evt.newValue);
@@ -240,7 +250,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var listFoldout = new Foldout { text = $"{fieldInfo.Name} ({listInstance.Count} items)", value = false };
             listFoldout.style.fontSize = UIThemeConstants.FontSizes.Normal;
             listFoldout.style.marginLeft = UIThemeConstants.Spacing.Padding;
-            listFoldout.style.marginBottom = UIThemeConstants.Spacing.Padding;
+            listFoldout.style.marginBottom = 4;
 
             var listItemsContainer = UIElementFactory.CreateListItemsContainer();
 
@@ -267,9 +277,9 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             itemContainer.style.justifyContent = Justify.SpaceBetween;
             itemContainer.style.paddingLeft = UIThemeConstants.Spacing.SmallPadding;
             itemContainer.style.paddingRight = UIThemeConstants.Spacing.SmallPadding;
-            itemContainer.style.paddingTop = UIThemeConstants.Spacing.SmallMargin;
-            itemContainer.style.paddingBottom = UIThemeConstants.Spacing.SmallMargin;
-            itemContainer.style.marginBottom = UIThemeConstants.Spacing.ItemMarginBottom;
+            itemContainer.style.paddingTop = 1;
+            itemContainer.style.paddingBottom = 1;
+            itemContainer.style.marginBottom = 2;
             itemContainer.style.borderBottomWidth = UIThemeConstants.Sizes.BorderWidth;
             itemContainer.style.borderBottomColor = new StyleColor(UIThemeConstants.Colors.BorderDark);
 
@@ -380,6 +390,17 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         {
             if (_selectedPipeline != null)
                 EditorUtility.SetDirty(_selectedPipeline);
+        }
+
+        /// <summary>
+        /// Apply compact vertical spacing to an element
+        /// </summary>
+        private static void ApplyCompactStyle(VisualElement element)
+        {
+            element.style.marginTop = 0;
+            element.style.marginBottom = 0;
+            element.style.paddingTop = 2;
+            element.style.paddingBottom = 2;
         }
     }
 }

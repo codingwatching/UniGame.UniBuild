@@ -1,0 +1,22 @@
+namespace UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration
+{
+    using System;
+
+    /// <summary>
+    /// Attribute to conditionally show a field based on a condition
+    /// Used by PipelineSettingsRenderer to determine field visibility
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class ShowIfAttribute : Attribute
+    {
+        /// <summary>
+        /// Name of a bool field, property, or method to check for visibility
+        /// </summary>
+        public string Condition { get; }
+
+        public ShowIfAttribute(string condition)
+        {
+            Condition = condition;
+        }
+    }
+}

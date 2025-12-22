@@ -41,6 +41,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         private VisualElement _pipelineEditorContainer;
         private VisualElement _commandCatalogContainer;
         private VisualElement _settingsContainer;
+        private VisualElement _pipelineSettingsContainer;
         private TextField _pipelineSearchField;
         private TextField _commandSearchField;
         private TextField _stepSearchField;
@@ -58,6 +59,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         private Dictionary<Type, BuildCommandMetadataAttribute> _commandMetadata;
         private List<PipelineExecutionState> _executionHistory = new List<PipelineExecutionState>();
         private string _stepSearchFilter = ""; // Current step search filter
+        private PipelineSettingsRenderer _pipelineSettingsRenderer; // Settings renderer for selected pipeline
         
         // Drag-Drop manager
         private DragDropManager _dragDropManager;
@@ -248,6 +250,15 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
 
             panel.Add(editorHeader);
 
+            // Create tabs for Pipeline Steps and Pipeline Settings
+            var editorTabs = new CustomTabView();
+            editorTabs.style.flexGrow = 1;
+
+            // Tab 1: Pipeline Steps
+            var stepsTab = new CustomTabView.Tab() { label = "Pipeline Steps", content = new VisualElement() };
+            stepsTab.content.style.flexDirection = FlexDirection.Column;
+            stepsTab.content.style.flexGrow = 1;
+
             // Step search
             _stepSearchField = new TextField();
             _stepSearchField.value = "";
@@ -256,12 +267,33 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             _stepSearchField.style.marginTop = 8;
             _stepSearchField.style.marginBottom = 8;
             _stepSearchField.RegisterValueChangedCallback(evt => FilterPipelineSteps(evt.newValue));
-            panel.Add(_stepSearchField);
+            stepsTab.content.Add(_stepSearchField);
 
-            // Editor container
+            // Steps container
             _pipelineEditorContainer = new ScrollView();
             _pipelineEditorContainer.style.flexGrow = 1;
-            panel.Add(_pipelineEditorContainer);
+            stepsTab.content.Add(_pipelineEditorContainer);
+
+            editorTabs.Add(stepsTab);
+
+            // Tab 2: Pipeline Settings
+            var settingsTab = new CustomTabView.Tab() { label = "Pipeline Settings", content = new VisualElement() };
+            settingsTab.content.style.flexDirection = FlexDirection.Column;
+            settingsTab.content.style.flexGrow = 1;
+            settingsTab.content.style.paddingLeft = 8;
+            settingsTab.content.style.paddingRight = 8;
+
+            _pipelineSettingsContainer = new VisualElement();
+            _pipelineSettingsContainer.style.flexDirection = FlexDirection.Column;
+            _pipelineSettingsContainer.style.flexGrow = 1;
+            settingsTab.content.Add(_pipelineSettingsContainer);
+
+            // Initialize settings renderer
+            _pipelineSettingsRenderer = new PipelineSettingsRenderer(_pipelineSettingsContainer);
+
+            editorTabs.Add(settingsTab);
+
+            panel.Add(editorTabs);
 
             return panel;
         }
@@ -446,10 +478,18 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         {
             _pipelineListContainer.Clear();
 
-            foreach (var pipeline in _loadedPipelines.OrderBy(p => p.name))
+            var sortedPipelines = _loadedPipelines.OrderBy(p => p.name).ToList();
+            
+            foreach (var pipeline in sortedPipelines)
             {
                 var pipelineItem = CreatePipelineListItem(pipeline);
                 _pipelineListContainer.Add(pipelineItem);
+            }
+            
+            // Auto-select first pipeline if none is selected
+            if (_selectedPipeline == null && sortedPipelines.Count > 0)
+            {
+                SelectPipeline(sortedPipelines[0]);
             }
         }
 
@@ -512,8 +552,15 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             if (_selectedPipeline == null)
             {
                 _pipelineEditorContainer.Add(new Label("No pipeline selected"));
+                // Also refresh settings display
+                if (_pipelineSettingsRenderer != null)
+                    _pipelineSettingsRenderer.RefreshSettings(null);
                 return;
             }
+
+            // Refresh settings display
+            if (_pipelineSettingsRenderer != null)
+                _pipelineSettingsRenderer.RefreshSettings(_selectedPipeline);
 
             // Pipeline info
             var infoBox = new VisualElement();

@@ -26,8 +26,9 @@
         public bool overrideArtifactName = true;
 
 #if ODIN_INSPECTOR
-        [ShowIf(nameof(overrideArtifactName))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideArtifactName))]
 #endif
+        [ShowIf(nameof(overrideArtifactName))]
         [Tooltip("artifact name")]
         public string artifactName = string.Empty;
 
@@ -35,8 +36,9 @@
         public bool overrideProductName = false;
 
 #if ODIN_INSPECTOR
-        [ShowIf(nameof(overrideProductName))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideProductName))]
 #endif
+        [ShowIf(nameof(overrideProductName))]
         [Tooltip("artifact name")]
         public string productName = string.Empty;
 
@@ -44,8 +46,9 @@
         public bool overrideBundleName = false;
 
 #if ODIN_INSPECTOR
-        [ShowIf(nameof(overrideBundleName))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideBundleName))]
 #endif
+        [ShowIf(nameof(overrideBundleName))]
         [Tooltip("use application name as bundle name")]
         public string bundleName = string.Empty;
 
@@ -53,8 +56,9 @@
         public bool overrideCompanyName = false;
 
 #if ODIN_INSPECTOR
-        [ShowIf(nameof(overrideCompanyName))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideCompanyName))]
 #endif
+        [ShowIf(nameof(overrideCompanyName))]
         [Tooltip("game company name")]
         public string companyName = string.Empty;
 
@@ -62,8 +66,9 @@
         public bool useBuildProfile = false;
         
 #if ODIN_INSPECTOR
-        [ShowIf(nameof(useBuildProfile))]
+        [Sirenix.OdinInspector.ShowIf(nameof(useBuildProfile))]
 #endif
+        [ShowIf(nameof(useBuildProfile))]
         public BuildProfile buildProfile;
 
         [FormerlySerializedAs("_buildTarget")]
@@ -75,8 +80,9 @@
         public BuildTargetGroup buildTargetGroup = BuildTargetGroup.Android;
 
 #if ODIN_INSPECTOR || TRI_INSPECTOR
-        [ShowIf(nameof(IsShownStandaloneSubTarget))]
+        [Sirenix.OdinInspector.ShowIf(nameof(IsShownStandaloneSubTarget))]
 #endif
+        [ShowIf(nameof(IsShownStandaloneSubTarget))]
         public StandaloneBuildSubtarget standaloneBuildSubTarget = StandaloneBuildSubtarget.Player;
 
         public ScriptingImplementation scriptingImplementation = ScriptingImplementation.Mono2x;
@@ -101,21 +107,23 @@
 
 #if ODIN_INSPECTOR || TRI_INSPECTOR
         [BoxGroup(nameof(buildOptions))]
-        [ShowIf(nameof(developmentBuild))]
+        [Sirenix.OdinInspector.ShowIf(nameof(developmentBuild))]
 #endif
+        [ShowIf(nameof(developmentBuild))]
         public bool autoconnectProfiler;
 
 #if ODIN_INSPECTOR || TRI_INSPECTOR
         [BoxGroup(nameof(buildOptions))]
-        [ShowIf(nameof(developmentBuild))]
+        [Sirenix.OdinInspector.ShowIf(nameof(developmentBuild))]
 #endif
+        [ShowIf(nameof(developmentBuild))]
         [Tooltip("enable deep profiling")]
         public bool deepProfiling;
 
 #if ODIN_INSPECTOR || TRI_INSPECTOR
-        [ShowIf(nameof(developmentBuild))]
         [BoxGroup(nameof(buildOptions))]
 #endif
+        [ShowIf(nameof(developmentBuild))]
         [Tooltip("allow script debugging")]
         public bool scriptDebugging;
 
@@ -137,36 +145,42 @@
 #if ODIN_INSPECTOR
         [FoldoutGroup("Logging")]
 #endif
+        [Tooltip("override logs level")]
         public bool overrideLogsSettings = false;
 
 #if ODIN_INSPECTOR
         [FoldoutGroup("Logging")]
-        [ShowIf(nameof(overrideLogsSettings))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideLogsSettings))]
 #endif
+        [ShowIf(nameof(overrideLogsSettings))]
         public StackTraceLogType logsLevel = StackTraceLogType.None;
 
 #if ODIN_INSPECTOR
         [FoldoutGroup("Logging")]
-        [ShowIf(nameof(overrideLogsSettings))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideLogsSettings))]
 #endif
+        [ShowIf(nameof(overrideLogsSettings))]
         public StackTraceLogType warningLevel = StackTraceLogType.None;
 
 #if ODIN_INSPECTOR
         [FoldoutGroup("Logging")]
-        [ShowIf(nameof(overrideLogsSettings))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideLogsSettings))]
 #endif
+        [ShowIf(nameof(overrideLogsSettings))]
         public StackTraceLogType errorLevel = StackTraceLogType.ScriptOnly;
 
 #if ODIN_INSPECTOR
         [FoldoutGroup("Logging")]
-        [ShowIf(nameof(overrideLogsSettings))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideLogsSettings))]
 #endif
+        [ShowIf(nameof(overrideLogsSettings))]
         public StackTraceLogType exceptionLevel = StackTraceLogType.ScriptOnly;
 
 #if ODIN_INSPECTOR
         [FoldoutGroup("Logging")]
-        [ShowIf(nameof(overrideLogsSettings))]
+        [Sirenix.OdinInspector.ShowIf(nameof(overrideLogsSettings))]
 #endif
+        [ShowIf(nameof(overrideLogsSettings))]
         public StackTraceLogType assertLevel = StackTraceLogType.ScriptOnly;
 
         [Tooltip("Build Arguments")]

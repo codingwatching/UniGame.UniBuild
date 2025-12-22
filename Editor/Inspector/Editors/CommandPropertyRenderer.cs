@@ -36,7 +36,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var headerRow = new VisualElement();
             headerRow.style.flexDirection = FlexDirection.Row;
             headerRow.style.alignItems = Align.Center;
-            headerRow.style.marginBottom = UIThemeConstants.Spacing.Padding;
+            headerRow.style.marginBottom = 4;
             headerRow.style.paddingLeft = UIThemeConstants.Spacing.SmallPadding;
             headerRow.style.paddingRight = UIThemeConstants.Spacing.SmallPadding;
 

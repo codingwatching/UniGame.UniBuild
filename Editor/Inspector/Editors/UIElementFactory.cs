@@ -33,8 +33,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             container.style.paddingLeft = UIThemeConstants.Spacing.SmallPadding;
             container.style.paddingRight = UIThemeConstants.Spacing.SmallPadding;
             container.style.paddingTop = UIThemeConstants.Spacing.SmallMargin;
-            container.style.paddingBottom = UIThemeConstants.Spacing.SmallPadding;
-            container.style.marginBottom = UIThemeConstants.Spacing.Margin;
+            container.style.paddingBottom = 2;
+            container.style.marginBottom = 2;
             
             if (includeBorder)
             {
@@ -56,8 +56,8 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             row.style.justifyContent = Justify.SpaceBetween;
             row.style.paddingLeft = UIThemeConstants.Spacing.SmallPadding;
             row.style.paddingRight = UIThemeConstants.Spacing.SmallPadding;
-            row.style.paddingTop = 3;
-            row.style.paddingBottom = 3;
+            row.style.paddingTop = 2;
+            row.style.paddingBottom = 2;
             row.style.marginBottom = UIThemeConstants.Spacing.ItemMarginBottom;
             row.style.borderBottomWidth = UIThemeConstants.Sizes.BorderWidth;
             row.style.borderBottomColor = new StyleColor(UIThemeConstants.Colors.BorderDefault);

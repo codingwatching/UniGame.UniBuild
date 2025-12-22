@@ -43,7 +43,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             public const int SmallMargin = 2;
             public const int Padding = 8;
             public const int SmallPadding = 4;
-            public const int ItemMarginBottom = 4;
+            public const int ItemMarginBottom = 2;
             public const int ListItemHeight = 60;
         }
         
