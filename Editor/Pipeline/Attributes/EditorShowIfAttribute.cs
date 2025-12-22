@@ -1,4 +1,4 @@
-namespace UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration
+﻿namespace Editor.Pipeline.Attributes
 {
     using System;
 
@@ -7,14 +7,14 @@ namespace UniGame.UniBuild.Editor.ClientBuild.BuildConfiguration
     /// Used by PipelineSettingsRenderer to determine field visibility
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class ShowIfAttribute : Attribute
+    public class EditorShowIfAttribute : Attribute
     {
         /// <summary>
         /// Name of a bool field, property, or method to check for visibility
         /// </summary>
         public string Condition { get; }
 
-        public ShowIfAttribute(string condition)
+        public EditorShowIfAttribute(string condition)
         {
             Condition = condition;
         }

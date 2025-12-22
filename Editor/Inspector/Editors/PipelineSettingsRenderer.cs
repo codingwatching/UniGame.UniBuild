@@ -5,11 +5,14 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
     using System.Linq;
     using System.Reflection;
     using ClientBuild.BuildConfiguration;
+    using global::Editor.Pipeline.Attributes;
+    using Sirenix.OdinInspector;
     using UnityEditor;
     using UnityEditor.Build.Profile;
     using UnityEditor.UIElements;
     using UnityEngine;
     using UnityEngine.UIElements;
+    using HideIfAttribute = ClientBuild.BuildConfiguration.HideIfAttribute;
 
     /// <summary>
     /// Renders build settings for a selected pipeline using reflection
@@ -94,7 +97,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
             var showIfMap = new Dictionary<string, string>();
             foreach (var field in fields)
             {
-                var showIfAttr = field.GetCustomAttribute<ShowIfAttribute>();
+                var showIfAttr = field.GetCustomAttribute<EditorShowIfAttribute>();
                 if (showIfAttr != null)
                 {
                     showIfMap[field.Name] = showIfAttr.Condition;
