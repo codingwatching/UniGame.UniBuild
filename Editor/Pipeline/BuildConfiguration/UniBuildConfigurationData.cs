@@ -20,6 +20,8 @@
     [Serializable]
     public class UniBuildConfigurationData
     {
+        public const string BuildOptionsKey = "Build Options:";
+        
         [Tooltip("if true build report will be printed")]
         public bool printBuildReport = true;
 
@@ -72,6 +74,7 @@
         [EditorShowIf(nameof(useBuildProfile))]
         public BuildProfile buildProfile;
 
+        
         [FormerlySerializedAs("_buildTarget")]
         [SerializeField]
         public BuildTarget buildTarget = BuildTarget.Android;
@@ -86,10 +89,24 @@
         [EditorShowIf(nameof(IsShownStandaloneSubTarget))]
         public StandaloneBuildSubtarget standaloneBuildSubTarget = StandaloneBuildSubtarget.Player;
 
-        public ScriptingImplementation scriptingImplementation = ScriptingImplementation.Mono2x;
+#if ODIN_INSPECTOR || TRI_INSPECTOR
+        [BoxGroup(BuildOptionsKey)]
+#endif
+        public ScriptingImplementation scriptingImplementation = ScriptingImplementation.IL2CPP;
+        
+#if ODIN_INSPECTOR || TRI_INSPECTOR
+        [BoxGroup(BuildOptionsKey)]
+#endif
         public Il2CppCodeGeneration il2CppCodeGeneration = Il2CppCodeGeneration.OptimizeSpeed;
+        
+#if ODIN_INSPECTOR || TRI_INSPECTOR
+        [BoxGroup(BuildOptionsKey)]
+#endif
         public Il2CppCompilerConfiguration cppCompilerConfiguration = Il2CppCompilerConfiguration.Release;
 
+#if ODIN_INSPECTOR || TRI_INSPECTOR
+        [BoxGroup(BuildOptionsKey)]
+#endif
 #if ODIN_INSPECTOR || TRI_INSPECTOR
         [ShowIf(nameof(IsWebGL))]
         [InlineProperty]
@@ -98,49 +115,59 @@
 #endif
         [EditorShowIf(nameof(IsWebGL))]
         public WebGlBuildData webGlBuildData = new();
-
-        public bool IsWebGL => buildTarget == BuildTarget.WebGL;
-
+        
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.HideIf(nameof(useBuildProfile))]
+#endif
 #if ODIN_INSPECTOR || TRI_INSPECTOR
-        [BoxGroup(nameof(buildOptions))]
+        [BoxGroup(BuildOptionsKey)]
 #endif
         [Tooltip("development build")]
         public bool developmentBuild;
 
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.HideIf(nameof(useBuildProfile))]
+#endif
 #if ODIN_INSPECTOR || TRI_INSPECTOR
-        [BoxGroup(nameof(buildOptions))]
+        [BoxGroup(BuildOptionsKey)]
         [Sirenix.OdinInspector.ShowIf(nameof(developmentBuild))]
 #endif
         [EditorShowIf(nameof(developmentBuild))]
         public bool autoconnectProfiler;
 
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.HideIf(nameof(useBuildProfile))]
+#endif
 #if ODIN_INSPECTOR || TRI_INSPECTOR
-        [BoxGroup(nameof(buildOptions))]
+        [BoxGroup(BuildOptionsKey)]
         [Sirenix.OdinInspector.ShowIf(nameof(developmentBuild))]
 #endif
         [EditorShowIf(nameof(developmentBuild))]
         [Tooltip("enable deep profiling")]
         public bool deepProfiling;
 
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.HideIf(nameof(useBuildProfile))]
+#endif
 #if ODIN_INSPECTOR || TRI_INSPECTOR
-        [BoxGroup(nameof(buildOptions))]
+        [BoxGroup(BuildOptionsKey)]
 #endif
         [EditorShowIf(nameof(developmentBuild))]
         [Tooltip("allow script debugging")]
         public bool scriptDebugging;
 
 #if ODIN_INSPECTOR
-        [BoxGroup(nameof(buildOptions))]
+        [BoxGroup(BuildOptionsKey)]
 #endif
         public bool runOnBuildFinish;
 
 #if ODIN_INSPECTOR
-        [BoxGroup(nameof(buildOptions))]
+        [BoxGroup(BuildOptionsKey)]
 #endif
         public BuildOptions buildOptions = BuildOptions.None;
 
 #if ODIN_INSPECTOR
-        [BoxGroup(nameof(buildOptions))]
+        [BoxGroup(BuildOptionsKey)]
 #endif
         public ManagedStrippingLevel strippingLevel = ManagedStrippingLevel.Minimal;
 
@@ -196,6 +223,10 @@
 #endif
         public ArgumentsMap buildArguments = new();
 
+        
+        public bool IsWebGL => buildTarget == BuildTarget.WebGL;
+
+        
         public bool IsShownStandaloneSubTarget()
         {
             switch (buildTarget)
