@@ -46,7 +46,7 @@ namespace UniGame
             }
             else
             {
-                UniBuildTool.ExecuteBuild(configuration);
+                UniBuildPipelineTool.ExecuteBuild(configuration);
             }
             
             Debug.Log("UNI BUILD: START PreExport COMMAND");

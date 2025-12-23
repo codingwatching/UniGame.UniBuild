@@ -26,6 +26,7 @@
 
             //apply build settings
             var buildParameters = configuration.BuildParameters;
+            
             buildParameters.Execute();
             
             var id = BuildLogger.LogWithTimeTrack($"Build Start At {DateTime.Now.ToLongDateString()}");
@@ -153,18 +154,6 @@
 
             var scenesArray = scenes.Select(x => x.path).ToArray();
             
-            var buildConfig = new BuildPlayerOptions
-            {
-                locationPathName = outputLocation,
-                target = buildParameters.buildTarget,
-                #if UNITY_STANDALONE || UNITY_SERVER
-                subtarget = (int)buildParameters.standaloneBuildSubtarget,
-                #endif
-                scenes = scenesArray,
-                options = buildOptions,
-                targetGroup = buildParameters.buildTargetGroup,
-            };
-
             var buildProfile = buildParameters.buildProfile;
             
             BuildReport report = default;
@@ -181,6 +170,18 @@
             }
             else
             {
+                var buildConfig = new BuildPlayerOptions
+                {
+                    locationPathName = outputLocation,
+                    target = buildParameters.buildTarget,
+#if UNITY_STANDALONE || UNITY_SERVER
+                subtarget = (int)buildParameters.standaloneBuildSubtarget,
+#endif
+                    scenes = scenesArray,
+                    options = buildOptions,
+                    targetGroup = buildParameters.buildTargetGroup,
+                };
+                
                 report = BuildPipeline.BuildPlayer(buildConfig);
                 BuildLogger.Log(report.ReportMessage());
             }

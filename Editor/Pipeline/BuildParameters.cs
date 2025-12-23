@@ -62,6 +62,13 @@ namespace UniGame.UniBuild.Editor
 
         public void Execute()
         {
+            buildProfile = _buildData.useBuildProfile ? _buildData.buildProfile : null;
+
+            if (buildProfile != null)
+            {
+                BuildProfile.SetActiveBuildProfile(buildProfile);
+            }
+            
             var buildArguments = _buildData.buildArguments;
             if (buildArguments.isEnable)
             {
@@ -91,7 +98,6 @@ namespace UniGame.UniBuild.Editor
                 companyName = _buildData.companyName;
             
             printBuildReport=  _buildData.printBuildReport;
-            buildProfile = _buildData.useBuildProfile ? _buildData.buildProfile : null;
             buildTarget      = _buildData.buildTarget;
             buildTargetGroup = _buildData.buildTargetGroup;
             standaloneBuildSubtarget = _buildData.standaloneBuildSubTarget;

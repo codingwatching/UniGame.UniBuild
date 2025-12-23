@@ -25,7 +25,7 @@ namespace UniGame.UniBuild.Editor
         public const string SettingsTabKey = "settings";
         public const string CommandsTabKey = "commands";
         
-        private static Color _oddColor = new Color(0.2f, 0.4f, 0.3f);
+        private static Color _oddColor = new(0.2f, 0.4f, 0.3f);
         
 #if  ODIN_INSPECTOR
         [TabGroup(SettingsTabKey)]
@@ -41,7 +41,7 @@ namespace UniGame.UniBuild.Editor
 #endif
         [FormerlySerializedAs("_buildData")]
         [SerializeField]
-        private UniBuildConfigurationData buildData = new UniBuildConfigurationData();
+        private UniBuildConfigurationData buildData = new();
         
 #if  ODIN_INSPECTOR || TRI_INSPECTOR
         [Space]
@@ -52,7 +52,7 @@ namespace UniGame.UniBuild.Editor
         [ListDrawerSettings(AddCopiesLastElement = false,ElementColor = nameof(GetElementColor))]
 #endif
         [Space]
-        public List<BuildCommandStep> preBuildCommands = new List<BuildCommandStep>();
+        public List<BuildCommandStep> preBuildCommands = new();
 
 #if  ODIN_INSPECTOR || TRI_INSPECTOR
         [Space(6f)]
@@ -63,7 +63,7 @@ namespace UniGame.UniBuild.Editor
         [ListDrawerSettings(AddCopiesLastElement = false, ElementColor = nameof(GetElementColor))]
 #endif
         [Space]
-        public List<BuildCommandStep> postBuildCommands = new List<BuildCommandStep>();
+        public List<BuildCommandStep> postBuildCommands = new();
 
         #region public properties
 
@@ -178,7 +178,7 @@ namespace UniGame.UniBuild.Editor
 #endif
         public void ExecuteBuild()
         {
-            UniBuildTool.ExecuteBuild(this);
+            UniBuildPipelineTool.ExecuteBuild(this);
         }
         
 #if  ODIN_INSPECTOR || TRI_INSPECTOR
@@ -196,7 +196,7 @@ namespace UniGame.UniBuild.Editor
         {
             var commandsMap = Instantiate(this);
             commandsMap.buildData.buildOptions |= BuildOptions.AutoRunPlayer;
-            UniBuildTool.ExecuteBuild(commandsMap);
+            UniBuildPipelineTool.ExecuteBuild(commandsMap);
         }
         
 #if ODIN_INSPECTOR

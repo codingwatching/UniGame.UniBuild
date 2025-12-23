@@ -12,7 +12,7 @@ namespace UniGame.UniBuild.Editor
     using UnityEditor.Build.Reporting;
     using Object = Object;
 
-    public static class UniBuildTool
+    public static class UniBuildPipelineTool
     {
 
         public const string BuildFolder = "Build";

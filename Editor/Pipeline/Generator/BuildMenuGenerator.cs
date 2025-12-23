@@ -22,7 +22,7 @@
             var methods = GetBuildMethods().ToList();
             var usings = new List<string>() {
                 typeof(MenuItem).Namespace,
-                typeof(UniBuildTool).Namespace
+                typeof(UniBuildPipelineTool).Namespace
             };
 
             var usingDirectives = usings
@@ -43,10 +43,10 @@
             var map = new List<string>();
             var commands = AssetEditorTools.GetAssets<UniBuildPipeline>();
             foreach (var command in commands) {
-                map.Add(CreateBuildMethod(MenuTemplate,BuildTemplate,nameof(UniBuildTool.BuildByConfigurationId),command));
+                map.Add(CreateBuildMethod(MenuTemplate,BuildTemplate,nameof(UniBuildPipelineTool.BuildByConfigurationId),command));
             }
             foreach (var command in commands) {
-                map.Add(CreateBuildMethod(MenuAndRunTemplate,BuildAndRunTemplate,nameof(UniBuildTool.BuildAndRunByConfigurationId),command));
+                map.Add(CreateBuildMethod(MenuAndRunTemplate,BuildAndRunTemplate,nameof(UniBuildPipelineTool.BuildAndRunByConfigurationId),command));
             }
             return map.ToArray();
         }
