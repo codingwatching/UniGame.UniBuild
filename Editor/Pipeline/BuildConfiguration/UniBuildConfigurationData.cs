@@ -111,7 +111,6 @@
         [ShowIf(nameof(IsWebGL))]
         [InlineProperty]
         [HideLabel]
-        [FoldoutGroup("WebGL")]
 #endif
         [EditorShowIf(nameof(IsWebGL))]
         public WebGlBuildData webGlBuildData = new();
