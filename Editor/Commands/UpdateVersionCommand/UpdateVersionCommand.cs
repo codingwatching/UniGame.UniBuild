@@ -7,7 +7,6 @@ namespace UniGame.UniBuild.Editor
     using global::UniGame.UniBuild.UpdateVersionCommand;
     using Inspector;
     using UnityEditor;
-    using UnityEditor.Build.Profile;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
     using Utils;
