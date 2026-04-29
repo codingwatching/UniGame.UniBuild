@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using UniGame.UniBuild.Editor;
+using UniGame.UniBuild.Editor.Inspector;
 using UniModules;
 using UnityEditor;
 using UnityEngine;

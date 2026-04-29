@@ -3,7 +3,7 @@
     using System;
     using global::UniGame.AddressableAtlases;
     using global::UniGame.UniBuild.Editor;
-    using UniBuild.Editor.Inspector;
+    using UniGame.UniBuild.Editor.Inspector;
     using UniModules.Editor;
     using UnityEngine.Scripting.APIUpdating;
 
