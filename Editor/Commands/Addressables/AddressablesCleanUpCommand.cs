@@ -4,7 +4,7 @@ namespace UniGame.BuildCommands.Editor
 {
     using System;
     using global::UniGame.UniBuild.Editor;
-    using UniBuild.Editor.Inspector;
+    using UniGame.UniBuild.Editor.Inspector;
     using UnityEditor.Build.Pipeline.Utilities;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;

@@ -3,7 +3,7 @@
     using System;
     using global::UniGame.UniBuild.Editor;
     using global::UniGame.UniBuild.Editor.Commands;
-    using UniBuild.Editor.Inspector;
+    using UniGame.UniBuild.Editor.Inspector;
     using UnityEngine;
 
     [Serializable]

@@ -3,7 +3,7 @@
     using System;
     using global::UniGame.UniBuild.Editor;
     using Runtime.Extension;
-    using UniBuild.Editor.Inspector;
+    using UniGame.UniBuild.Editor.Inspector;
     using UnityEngine;
     using UnityEngine.Networking;
     using UnityEngine.Scripting.APIUpdating;

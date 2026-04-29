@@ -4,7 +4,7 @@ namespace UniGame.BuildCommands.Editor
 {
     using global::UniGame.UniBuild.Editor;
     using global::UniGame.UniBuild.Editor.Commands;
-    using UniBuild.Editor.Inspector;
+    using UniGame.UniBuild.Editor.Inspector;
     using UnityEngine.Scripting.APIUpdating;
 
     [CreateAssetMenu(menuName = "UniBuild//CommandsWeb/WebRequestPost",fileName = nameof(WebRequestPostAssetCommand))]

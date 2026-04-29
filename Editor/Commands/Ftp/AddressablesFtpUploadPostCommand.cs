@@ -5,8 +5,9 @@
     using System.IO;
     using System.Linq;
     using System.Net;
-    using AddressableTools.Editor;
+        using UniGame.AddressableTools.Editor;
     using global::UniGame.UniBuild.Editor;
+        using UniGame.UniBuild.Editor.Inspector;
     using UniModules;
     using UnityEngine;
     using UnityEngine.Scripting.APIUpdating;
@@ -96,9 +97,9 @@
             
             var buildFolder = string.IsNullOrEmpty(sourceDirectory)
                 ? location.sourceDirectoryValue
-                : sourceDirectory.EvaluateActiveProfileString();
+                : sourceDirectory.EvaluateAddressableProfileVariable();
             
-            var targetUploadDirectory = remoteDirectory.EvaluateActiveProfileString();
+            var targetUploadDirectory = remoteDirectory.EvaluateAddressableProfileVariable();
 
             if (!overrideTargetFolder)
             {

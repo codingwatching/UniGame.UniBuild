@@ -4,6 +4,7 @@
     "references": [
         "unigame.buildpipeline.editor",
         "unigame.unieditortools",
+        "unigame.addressables.editor",
         "unigame.addressables.tools.runtime",
         "unigame.addressable.atlases.runtime",
         "unigame.unicore.runtime",

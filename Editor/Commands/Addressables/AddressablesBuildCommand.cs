@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using global::UniGame.UniBuild.Editor;
-    using UniBuild.Editor.Inspector;
+    using UniGame.UniBuild.Editor.Inspector;
     using UnityEditor.AddressableAssets;
     using UnityEditor.AddressableAssets.Settings;
     using UnityEngine.Scripting.APIUpdating;

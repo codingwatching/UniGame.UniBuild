@@ -6,7 +6,7 @@ namespace UniGame.BuildCommands.Editor
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using UniBuild.Editor.Inspector;
+    using UniGame.UniBuild.Editor.Inspector;
     using UniModules.Editor;
     using UnityEditor;
     using UnityEditor.AddressableAssets.Settings;

@@ -1,7 +1,7 @@
 namespace UniGame.BuildCommands.Editor
 {
     using System;
-    using AddressableTools.Editor;
+        using UniGame.AddressableTools.Editor;
     using UnityEngine;
 
 #if ODIN_INSPECTOR
@@ -61,11 +61,11 @@ namespace UniGame.BuildCommands.Editor
         private void UpdatePreview()
         {
             sourceDirectoryValue = overrideSourceDirectory
-                    ? sourceDirectory.EvaluateActiveProfileString()
+                                        ? sourceDirectory.EvaluateAddressableProfileVariable()
                     : AddressableEditorTools.GetRemoteBuildPath();
             
             remoteDirectoryValue = overrideTargetFolder
-                    ? remoteDirectory.EvaluateActiveProfileString()
+                                        ? remoteDirectory.EvaluateAddressableProfileVariable()
                     : AddressableEditorTools.GetRemoteLoadPath();
         }
     }
