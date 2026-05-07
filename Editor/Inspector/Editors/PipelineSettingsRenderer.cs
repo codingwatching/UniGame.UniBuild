@@ -6,7 +6,6 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
     using System.Reflection;
     using ClientBuild.BuildConfiguration;
     using global::Editor.Pipeline.Attributes;
-    using Sirenix.OdinInspector;
     using UnityEditor;
     using UnityEditor.Build.Profile;
     using UnityEditor.UIElements;
@@ -14,6 +13,10 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
     using UnityEngine.UIElements;
     using HideIfAttribute = ClientBuild.BuildConfiguration.HideIfAttribute;
 
+#if ODIN_INSPECTOR
+    using Sirenix.OdinInspector;
+#endif
+    
     /// <summary>
     /// Renders build settings for a selected pipeline using reflection
     /// Supports ShowIf and HideIf attributes from Odin Inspector
@@ -186,6 +189,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
         /// </summary>
         private bool ShouldShowField(FieldInfo field)
         {
+#if ODIN_INSPECTOR
             // Check for ShowIf attribute
             var showIfAttr = field.GetCustomAttribute<ShowIfAttribute>();
             if (showIfAttr != null)
@@ -193,7 +197,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Editors
                 if (!EvaluateCondition(showIfAttr.Condition))
                     return false;
             }
-
+#endif
             // Check for HideIf attribute
             var hideIfAttr = field.GetCustomAttribute<HideIfAttribute>();
             if (hideIfAttr != null)
