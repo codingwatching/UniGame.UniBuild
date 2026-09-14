@@ -159,7 +159,7 @@ namespace UniGame.UniBuild.Editor
 #if UNITY_ANDROID
             var gradlePath = Environment.GetEnvironmentVariable("UNITY_GRADLE_HOME");
             if (buildParameters.buildTarget == BuildTarget.Android && !string.IsNullOrWhiteSpace(gradlePath))
-                AndroidExternalToolsSettings.gradlePath = gradlePath;
+                AndroidExternalToolsSettings.Gradle.path = gradlePath;
 #endif
             var outputLocation = GetTargetBuildLocation(configuration.BuildParameters);
             var buildOptions   = buildParameters.buildOptions;
