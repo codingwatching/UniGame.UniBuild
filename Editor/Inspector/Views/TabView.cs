@@ -10,11 +10,7 @@ namespace UniGame.UniBuild.Editor.Inspector.Views
     /// </summary>
     public class TabView : VisualElement
     {
-        public new class UxmlFactory : UxmlFactory<TabView, UxmlTraits> { }
-
-        public new class UxmlTraits : VisualElement.UxmlTraits { }
-
-        private VisualElement _tabHeaderContainer;
+private VisualElement _tabHeaderContainer;
         private VisualElement _tabContentContainer;
         private List<Tab> _tabs = new List<Tab>();
         private Tab _activeTab;

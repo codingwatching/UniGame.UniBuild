@@ -21,7 +21,7 @@ public class UniBuildConfigurationAsset : ScriptableObject
         
 #if ODIN_INSPECTOR
     [Searchable]
-    [ListDrawerSettings(Expanded = true,ListElementLabelName = "@Name")]
+    [ListDrawerSettings(ShowFoldout = true,ListElementLabelName = "@Name")]
 #endif
 #if TRI_INSPECTOR || ODIN_INSPECTOR
     [InlineProperty]

@@ -41,7 +41,6 @@
             return isActive ? 
                 new Color(0.2f, 1f, 0.2f) : 
                 new Color(1, 0.6f, 0.4f);
-            return Color.green;
         }
     }
 }

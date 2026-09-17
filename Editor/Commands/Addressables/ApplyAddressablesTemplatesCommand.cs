@@ -1,4 +1,4 @@
-﻿namespace UniGame.BuildCommands.Editor
+namespace UniGame.BuildCommands.Editor
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +20,7 @@
     {
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.InlineProperty]
-        [Sirenix.OdinInspector.ListDrawerSettings(Expanded = true,DraggableItems = true,ShowPaging = true)]
+        [Sirenix.OdinInspector.ListDrawerSettings(ShowFoldout = true,DraggableItems = true,ShowPaging = true)]
 #endif
         public List<AddressableTemplateRule> groupRules = new List<AddressableTemplateRule>();
 
