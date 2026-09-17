@@ -90,7 +90,15 @@ namespace UniGame.UniBuild.Editor
         {
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
             var asset     = AssetDatabase.LoadAssetAtPath<UniBuildPipeline>(assetPath);
-            RequestBuild(asset);
+            var result = RequestBuild(asset);
+
+            if (!Application.isBatchMode)
+                return;
+
+            var succeeded = result.Status == UniBuildExecutionStatus.Completed &&
+                            (!result.PlayerBuildEnabled || result.Report == null ||
+                             result.Report.summary.result == BuildResult.Succeeded);
+            EditorApplication.Exit(succeeded ? 0 : 1);
         }
         
         public static void BuildAndRunByConfigurationId(string guid)
